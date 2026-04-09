@@ -1,13 +1,17 @@
 import { AdminPageHeader } from "../components/AdminPageHeader";
 
+import { EventsDatabase } from "./components/EventsDatabase";
+
 export default function EventManagementPage() {
   return (
     <>
       <AdminPageHeader
         title="Event Management"
-        subtitle="Create and organize cards, bouts, and schedules"
+        subtitle="Manage and configure live event data, create fight cards, and define matchups"
+        actionLabel="Create Event"
+        actionHref="/admin/event-management/new"
       />
-      <section className="rounded-xl border border-border/60 bg-card p-6">Event management content</section>
+      <EventsDatabase />
     </>
   );
 }

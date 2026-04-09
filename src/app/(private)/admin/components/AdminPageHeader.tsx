@@ -14,7 +14,7 @@ export function AdminPageHeader({ title, subtitle, actionLabel, actionHref }: Ad
   const hasAction = Boolean(actionLabel && actionHref);
 
   return (
-    <section className="flex flex-wrap items-start justify-between gap-4 rounded-xl bg-slate-100/70 ">
+    <section className="flex flex-wrap items-start justify-between gap-4  ">
       <div className="space-y-1">
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">{title}</h1>
         <p className="text-sm text-slate-600">{subtitle}</p>

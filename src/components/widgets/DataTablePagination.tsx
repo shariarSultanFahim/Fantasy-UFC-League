@@ -71,6 +71,7 @@ export function DataTablePagination({ page, limit, totalItems, onPageChange }: D
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
+              size="default"
               onClick={() => onPageChange(Math.max(safePage - 1, 1))}
               disabled={safePage === 1}
             />
@@ -87,7 +88,11 @@ export function DataTablePagination({ page, limit, totalItems, onPageChange }: D
 
             return (
               <PaginationItem key={token}>
-                <PaginationLink isActive={token === safePage} onClick={() => onPageChange(token)}>
+                <PaginationLink
+                  size="icon"
+                  isActive={token === safePage}
+                  onClick={() => onPageChange(token)}
+                >
                   {token}
                 </PaginationLink>
               </PaginationItem>
@@ -96,6 +101,7 @@ export function DataTablePagination({ page, limit, totalItems, onPageChange }: D
 
           <PaginationItem>
             <PaginationNext
+              size="default"
               onClick={() => onPageChange(Math.min(safePage + 1, totalPage))}
               disabled={safePage === totalPage}
             />

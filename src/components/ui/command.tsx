@@ -2,8 +2,8 @@
 
 import * as React from "react";
 
-import { SearchIcon } from "lucide-react";
 import { Command as CommandPrimitive } from "cmdk";
+import { SearchIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -40,7 +40,7 @@ function CommandList({ className, ...props }: React.ComponentProps<typeof Comman
   return (
     <CommandPrimitive.List
       data-slot="command-list"
-      className={cn("max-h-[300px] overflow-x-hidden overflow-y-auto", className)}
+      className={cn("max-h-75 overflow-x-hidden overflow-y-auto", className)}
       {...props}
     />
   );
@@ -104,3 +104,4 @@ export {
   CommandList,
   CommandSeparator
 };
+

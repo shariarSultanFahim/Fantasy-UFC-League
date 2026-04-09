@@ -1,10 +1,18 @@
 "use client";
 import {
-  BookOpen,
-  ClipboardClock,
+  Bell,
+  CalendarCog,
+  ClipboardPen,
+  FileText,
   HeartHandshake,
+  Info,
   LayoutDashboard,
   LogOut,
+  ShieldCheck,
+  ShieldUser,
+  Sword,
+  Swords,
+  Trophy,
   UserRoundPen
 } from "lucide-react";
 import Image from "next/image";
@@ -31,27 +39,72 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const data = {
   info: {
-    title: "Rise & Impact",
-    subtitle: "Instructor Portal"
+    title: "Fantasy UFC League",
+    subtitle: "Admin Portal"
   },
   navMain: [
     {
       title: "",
       items: [
         {
-          title: "Overview",
-          url: "/overview",
+          title: "Dashboard",
+          url: "/admin/dashboard",
           icon: LayoutDashboard
         },
         {
-          title: "User Management",
-          url: "/user-management",
-          icon: ClipboardClock
+          title: "Leagues",
+          url: "/admin/leagues",
+          icon: Trophy
         },
         {
-          title: "Course",
-          url: "/courses",
-          icon: BookOpen
+          title: "Fighters",
+          url: "/admin/fighters",
+          icon: Sword
+        },
+        {
+          title: "Draft Management",
+          url: "/admin/draft-management",
+          icon: ClipboardPen
+        },
+        {
+          title: "Fight Results",
+          url: "/admin/fight-results",
+          icon: Swords
+        },
+        {
+          title: "Scoring System",
+          url: "/admin/scoring-system",
+          icon: ShieldCheck
+        },
+        {
+          title: "Event Management",
+          url: "/admin/event-management",
+          icon: CalendarCog
+        },
+        {
+          title: "About",
+          url: "/admin/about",
+          icon: Info
+        },
+        {
+          title: "Privacy Policy",
+          url: "/admin/privacy-policy",
+          icon: ShieldUser
+        },
+        {
+          title: "Terms & Conditions",
+          url: "/admin/terms-and-conditions",
+          icon: FileText
+        },
+        {
+          title: "Profile",
+          url: "/admin/profile",
+          icon: UserRoundPen
+        },
+        {
+          title: "Notification",
+          url: "/admin/notification",
+          icon: Bell
         }
       ]
     }
@@ -62,12 +115,12 @@ const data = {
       items: [
         {
           title: "Profile",
-          url: "#",
+          url: "/admin/profile",
           icon: UserRoundPen
         },
         {
           title: "Support",
-          url: "#",
+          url: "/admin/about",
           icon: HeartHandshake
         }
       ]
@@ -77,15 +130,14 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
    const pathname = usePathname();
-
   return (
     <Sidebar variant="inset" collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+              <Link href="/admin">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg  text-sidebar-primary-foreground">
                   <Image src="/logo.png" alt="Logo" width={32} height={32} />
                 </div>
                 <div className="grid flex-1 text-sm leading-tight">
@@ -109,7 +161,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton 
                       asChild 
-                      isActive={pathname === item.url}
+                      isActive={pathname === item.url || pathname.startsWith(`${item.url}/`)}
                       className="data-[active=true]:bg-white/25 data-[active=true]:shadow-md data-[active=true]:backdrop-blur-sm data-[active=true]:text-primary-foreground"
                     >
                       <Link href={item.url}>

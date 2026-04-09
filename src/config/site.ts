@@ -1,14 +1,14 @@
-import type { SiteConfig } from "@/types/site-config";
 import { env } from "@/env";
+import type { SiteConfig } from "@/types/site-config";
 
 export const siteConfig: SiteConfig = {
-  name: "Rise & Impact Admin Panel",
-  description: "Production-ready Next.js 16+ starter built with Tailwind CSS 4 and TypeScript.",
+  name: "Fantasy UFC League",
+  description: "A fantasy sports league for UFC fans to create their own teams and compete against others.",
   url: env.NEXT_PUBLIC_SITE_URL,
-  author: "",
+  author: "Fantasy UFC League Team",
   locale: "en",
   themeColor: "#576045",
-  keywords: ["nextjs", "typescript", "tailwindcss", "boilerplate", "starter"],
+  keywords: ["fantasy sports", "UFC", "MMA", "sports league", "team management"],
   social: {
     twitter: "",
     github: "",

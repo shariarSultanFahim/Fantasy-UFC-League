@@ -1,31 +1,30 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Poppins } from "next/font/google";
 import type { ReactNode } from "react";
 
 import { seoConfig } from "@/config/seo";
 
 import { Providers } from "@/providers";
+import "@/styles/globals.css";
 import { Toaster } from "@/ui";
 
-import "@/styles/globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"]
+const fontSans = Poppins({
+  weight: ["400", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-sans"
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"]
+const fontMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
 });
-
 export const metadata: Metadata = seoConfig;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen w-full flex-col antialiased`}
+        className={`${fontSans.variable} ${fontMono.variable}  flex min-h-screen w-full flex-col antialiased`}
       >
         <Providers>
           <main className="flex-1">{children}</main>

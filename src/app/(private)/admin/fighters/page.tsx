@@ -1,5 +1,7 @@
 import { AdminPageHeader } from "../components/AdminPageHeader";
 
+import { FightersDatabase } from "./components/FightersDatabase";
+
 export default function FightersPage() {
   return (
     <>
@@ -9,7 +11,7 @@ export default function FightersPage() {
         actionLabel="Add New Fighter"
         actionHref="/admin/fighters/new"
       />
-      <section className="rounded-xl border border-border/60 bg-card p-6">Fighters content</section>
+      <FightersDatabase />
     </>
   );
 }

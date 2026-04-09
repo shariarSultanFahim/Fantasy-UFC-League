@@ -1,10 +1,15 @@
 import { AdminPageHeader } from "../../components/AdminPageHeader";
 
+import { FighterForm } from "../components/FighterForm";
+
 export default function NewFighterPage() {
   return (
     <>
-      <AdminPageHeader title="Add Fighter" subtitle="Create a new fighter profile for drafting" />
-      <section className="rounded-xl border border-border/60 bg-card p-6">Add fighter form</section>
+      <AdminPageHeader
+        title="Add New Fighter"
+        subtitle="Create a fighter profile with rank, records, and square avatar"
+      />
+      <FighterForm mode="create" />
     </>
   );
 }

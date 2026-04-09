@@ -1,0 +1,278 @@
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Save } from "lucide-react";
+import { useForm } from "react-hook-form";
+
+import { Button, Card, CardContent, CardHeader, CardTitle, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input, Textarea } from "@/components/ui";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+import { toast } from "sonner";
+import { fighterFormSchema, type FighterFormValues } from "../schema/fighter-form-schema";
+import { FighterImageCropUploader } from "./FighterImageCropUploader";
+import { DIVISION_OPTIONS, NATIONALITY_OPTIONS } from "./fighters-data";
+
+interface FighterFormProps {
+  mode: "create" | "edit";
+  initialValues?: Partial<FighterFormValues>;
+}
+
+const defaultValues: FighterFormValues = {
+  name: "",
+  nickname: "",
+  nationality: "",
+  division: "",
+  rank: 1,
+  wins: 0,
+  losses: 0,
+  draws: 0,
+  points: 0,
+  bio: "",
+  avatarDataUrl: ""
+};
+
+export function FighterForm({ mode, initialValues }: FighterFormProps) {
+  const form = useForm<FighterFormValues>({
+    resolver: zodResolver(fighterFormSchema),
+    defaultValues: {
+      ...defaultValues,
+      ...initialValues
+    }
+  });
+
+  const onSubmit = (values: FighterFormValues) => {
+    console.log("Form submitted with values:", values);
+    toast.success(mode === "create" ? "Fighter profile created successfully!" : "Fighter profile updated successfully!",{
+        position: "top-center",
+    });
+  };
+
+  return (
+    <Card className="py-0">
+      <CardHeader className="border-b px-5 py-4 sm:px-6">
+        <CardTitle className="text-xl font-semibold">
+          {mode === "create" ? "New Fighter Profile" : "Edit Fighter Profile"}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="px-5 py-6 sm:px-6">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <div className="grid gap-5 lg:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g. Jon Jones" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="nickname"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nickname</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g. Bones" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="division"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Division</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select division" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {DIVISION_OPTIONS.filter((item) => item !== "All Divisions").map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="nationality"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nationality</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select nationality" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {NATIONALITY_OPTIONS.filter((item) => item !== "All Nationalities").map(
+                          (option) => (
+                            <SelectItem key={option} value={option}>
+                              {option}
+                            </SelectItem>
+                          )
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              <FormField
+                control={form.control}
+                name="rank"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Rank</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={30}
+                        value={field.value}
+                        onChange={(event) => field.onChange(Number(event.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="wins"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Wins</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={0}
+                        value={field.value}
+                        onChange={(event) => field.onChange(Number(event.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="losses"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Losses</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={0}
+                        value={field.value}
+                        onChange={(event) => field.onChange(Number(event.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="draws"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Draws</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={0}
+                        value={field.value}
+                        onChange={(event) => field.onChange(Number(event.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="points"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Points</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={field.value}
+                      onChange={(event) => field.onChange(Number(event.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="bio"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex items-center justify-between gap-2">
+                    <FormLabel>Bio</FormLabel>
+                    <span className="text-xs text-muted-foreground">{field.value.length} characters</span>
+                  </div>
+                  <FormControl>
+                    <Textarea rows={4} placeholder="Write a short profile for this fighter..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="avatarDataUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <FighterImageCropUploader value={field.value} onChange={field.onChange} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="flex items-center justify-end gap-3">
+              <Button type="submit" className="min-w-36">
+                <Save className="size-4" />
+                {mode === "create" ? "Create Fighter" : "Save Changes"}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+  );
+}

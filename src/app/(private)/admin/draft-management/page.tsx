@@ -1,13 +1,16 @@
 import { AdminPageHeader } from "../components/AdminPageHeader";
+import { DraftHistoryDatabase } from "./components/DraftHistoryDatabase";
+import { DraftOverviewSection } from "./components/DraftOverviewSection";
 
 export default function DraftManagementPage() {
   return (
-    <>
+    <section className="space-y-6">
       <AdminPageHeader
         title="Draft Management"
         subtitle="Control draft rooms, picks, and draft settings"
       />
-      <section className="rounded-xl border border-border/60 bg-card p-6">Draft management content</section>
-    </>
+      <DraftOverviewSection />
+      <DraftHistoryDatabase />
+    </section>
   );
 }

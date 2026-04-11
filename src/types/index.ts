@@ -5,6 +5,7 @@ export type {
   UserActivityPoint
 } from "./admin-dashboard";
 export type { DataTableProps } from "./data-table";
+export type { DraftPickHistory, DraftRoomSnapshot, DraftTeam } from "./draft";
 export type {
   Event,
   EventBout,

@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 
-import { SerializedEditorState } from "lexical";
 import { RotateCcw, Save } from "lucide-react";
+import { SerializedEditorState } from "lexical";
 
 import { Editor } from "@/components/blocks/editor-00/editor";
 import { Button } from "@/components/ui/button";
@@ -74,7 +74,7 @@ export function LegalEditor({ initialContent, onSave }: LegalEditorProps) {
 
         <Button
           onClick={handleSave}
-          className="h-11 rounded-xl bg-[#3dbcf9] px-8 font-bold text-white shadow-sm shadow-[#3dbcf9]/20 hover:bg-[#3dbcf9]/90"
+          className="text-white shadow-sm shadow-primary/20 hover:bg-primary/90"
         >
           <Save className="mr-2 h-4 w-4" />
           Save Changes

@@ -14,7 +14,6 @@ import {
   LogOut,
   ShieldCheck,
   Sword,
-  Swords,
   Trophy,
   UserRoundPen
 } from "lucide-react";
@@ -65,11 +64,11 @@ const data = {
           url: "/admin/draft-management",
           icon: ClipboardPen
         },
-        {
-          title: "Fight Results",
-          url: "/admin/fight-results",
-          icon: Swords
-        },
+        // {
+        //   title: "Fight Results",
+        //   url: "/admin/fight-results",
+        //   icon: Swords
+        // },
         {
           title: "Scoring System",
           url: "/admin/scoring-system",

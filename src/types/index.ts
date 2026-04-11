@@ -17,4 +17,5 @@ export type {
 export type { Fighter, FighterFilters } from "./fighter";
 export type { League, LeagueStatus } from "./league";
 export type { AdminProfileFormValues, AdminProfileState } from "./profile";
+export type { ScoringSettings } from "./scoring";
 export type { User } from "./user";

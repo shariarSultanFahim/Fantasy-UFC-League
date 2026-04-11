@@ -1,4 +1,7 @@
 export type LeagueStatus = "active" | "drafting" | "completed";
+export type LeagueLobbyTab = "MY TEAM" | "FREE AGENTS" | "OPPOSING TEAM" | "LEADERBOARD";
+
+export type LeagueLobbyActionStyle = "dark" | "muted";
 
 export interface League {
   id: string;
@@ -9,4 +12,16 @@ export interface League {
   memberCount: number;
   memberLimit: number;
   status: LeagueStatus;
+}
+
+export interface LeagueLobbyEntry {
+  id: string;
+  name: string;
+  hasPasscode: boolean;
+  draftTime: string;
+  members: number;
+  memberLimit: number;
+  actionLabel: string;
+  actionStyle: LeagueLobbyActionStyle;
+  categories: LeagueLobbyTab[];
 }

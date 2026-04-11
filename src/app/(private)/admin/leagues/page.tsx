@@ -1,4 +1,5 @@
 import { AdminPageHeader } from "../components/AdminPageHeader";
+import { LeaguesDatabase } from "./components/LeaguesDatabase";
 
 export default function LeaguesPage() {
   return (
@@ -7,7 +8,7 @@ export default function LeaguesPage() {
         title="League Management"
         subtitle="Manage all active and upcoming leagues"
       />
-      <section className="rounded-xl border border-border/60 bg-card p-6">Leagues content</section>
+      <LeaguesDatabase />
     </>
   );
 }

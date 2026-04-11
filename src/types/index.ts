@@ -14,5 +14,6 @@ export type {
   EventStatus
 } from "./event";
 export type { Fighter, FighterFilters } from "./fighter";
+export type { League, LeagueStatus } from "./league";
 export type { AdminProfileFormValues, AdminProfileState } from "./profile";
 export type { User } from "./user";

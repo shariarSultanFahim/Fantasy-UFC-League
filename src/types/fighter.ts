@@ -16,4 +16,6 @@ export interface FighterFilters {
   division: string;
   rankRange: string;
   nationality: string;
+  minWins: number;
+  maxLosses: number;
 }

@@ -1,10 +1,20 @@
+import { RankingsDatabase } from "./components";
+
 export default function RankingsPage() {
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4">
-        <h1 className="text-4xl font-bold">Rankings</h1>
-        <p className="mt-4 text-gray-600">View fighter rankings and statistics.</p>
-      </div>
-    </div>
+    <main className="min-h-screen bg-slate-50 px-4 py-10 text-slate-900 sm:px-6 lg:px-8 lg:py-12">
+      <section className="mx-auto w-full max-w-6xl">
+        <div className="rounded-lg bg-[#0E172B] px-6 py-12 text-center text-white sm:px-10 lg:py-14">
+          <h1 className="text-5xl font-black tracking-tight sm:text-6xl">Fighters Directory</h1>
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
+            Explore stats, records, and rankings of the world&apos;s elite mixed martial artists.
+          </p>
+        </div>
+
+        <div className="mt-8">
+          <RankingsDatabase />
+        </div>
+      </section>
+    </main>
   );
 }

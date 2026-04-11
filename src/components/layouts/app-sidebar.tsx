@@ -5,11 +5,9 @@ import {
   ClipboardPen,
   FileText,
   HeartHandshake,
-  Info,
   LayoutDashboard,
   LogOut,
   ShieldCheck,
-  ShieldUser,
   Sword,
   Swords,
   Trophy,
@@ -82,18 +80,8 @@ const data = {
           icon: CalendarCog
         },
         {
-          title: "About",
-          url: "/admin/about",
-          icon: Info
-        },
-        {
-          title: "Privacy Policy",
-          url: "/admin/privacy-policy",
-          icon: ShieldUser
-        },
-        {
-          title: "Terms & Conditions",
-          url: "/admin/terms-and-conditions",
+          title: "Legal Content",
+          url: "/admin/legal",
           icon: FileText
         },
         {

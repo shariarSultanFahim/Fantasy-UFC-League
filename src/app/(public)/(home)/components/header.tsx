@@ -2,12 +2,17 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
+
+import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 
 export default function Header() {
+  const pathname = usePathname();
+
   const navLinks = [
     { href: "/home", label: "Home" },
     { href: "/rankings", label: "Rankings" },
@@ -25,6 +30,14 @@ export default function Header() {
     { icon: Instagram, href: "https://instagram.com", label: "Instagram" }
   ];
 
+  const isActiveRoute = (href: string) => {
+    if (href === "/home") {
+      return pathname === "/" || pathname === "/home";
+    }
+
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
   return (
     <header className="fixed top-0 right-0 left-0 z-50 border-b border-slate-800 bg-linear-to-r from-slate-950 via-slate-900 to-slate-900 text-white">
       <div className="container mx-auto px-4">
@@ -40,7 +53,12 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded px-3 py-2 text-sm font-medium text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
+                className={cn(
+                  "rounded px-3 py-2 text-sm font-medium transition-colors",
+                  isActiveRoute(link.href)
+                    ? "bg-slate-800 text-white"
+                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                )}
               >
                 {link.label}
               </Link>
@@ -93,7 +111,12 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded px-3 py-1 text-xs font-medium text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
+                className={cn(
+                  "rounded px-3 py-1 text-xs font-medium transition-colors",
+                  isActiveRoute(link.href)
+                    ? "bg-slate-800 text-white"
+                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                )}
               >
                 {link.label}
               </Link>

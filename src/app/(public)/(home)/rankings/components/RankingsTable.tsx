@@ -43,7 +43,7 @@ export function RankingsTable({ fighters, onFighterClick }: RankingsTableProps) 
               <TableRow
                 key={fighter.id}
                 onClick={() => onFighterClick?.(fighter)}
-                className="cursor-pointer hover:bg-slate-50 transition-colors"
+                className="cursor-pointer transition-colors hover:bg-slate-50"
               >
                 <TableCell className="px-5 py-4 sm:px-6">
                   <span className="font-bold text-[#EC5B13]">

@@ -3,7 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { getJoinedLeagueMembers, getLeagueLobbyMeta } from "@/helpers/league-lobby";
+import {
+  getCurrentLoggedInUserName,
+  getJoinedLeagueMembers,
+  getLeagueDraftStatus,
+  getLeagueLobbyMeta,
+  setLeagueDraftStatus
+} from "@/helpers/league-lobby";
 
 import { Button, Card } from "@/components/ui";
 
@@ -74,11 +80,20 @@ export function DraftLobbyBoard() {
   const searchParams = useSearchParams();
   const leagueId = searchParams.get("leagueId") ?? "league-023";
 
-  const [secondsLeft, setSecondsLeft] = useState(LOBBY_WAIT_SECONDS);
+  const [secondsLeft, setSecondsLeft] = useState(() =>
+    getLeagueDraftStatus(leagueId) === "waiting" ? LOBBY_WAIT_SECONDS : 0
+  );
+  const currentUserName = getCurrentLoggedInUserName();
 
   useEffect(() => {
     const interval = window.setInterval(() => {
       setSecondsLeft((previous) => {
+        const draftStatus = getLeagueDraftStatus(leagueId);
+
+        if (draftStatus !== "waiting") {
+          return 0;
+        }
+
         if (previous > 1) {
           return previous - 1;
         }
@@ -90,6 +105,8 @@ export function DraftLobbyBoard() {
         if (memberCount < memberLimit) {
           return LOBBY_WAIT_SECONDS;
         }
+
+        setLeagueDraftStatus(leagueId, "open");
 
         return 0;
       });
@@ -103,6 +120,8 @@ export function DraftLobbyBoard() {
   const leagueMeta = useMemo(() => getLeagueLobbyMeta(leagueId), [leagueId]);
   const leagueName = leagueMeta?.name ?? "MMA League #23";
   const memberLimit = leagueMeta?.memberLimit ?? 10;
+  const draftStatus = getLeagueDraftStatus(leagueId);
+  const isDraftRoomOpen = draftStatus === "open" || draftStatus === "drafting";
   const joinedNames = getJoinedLeagueMembers(leagueId).map((member) => member.name);
 
   const teamRows = useMemo(() => {
@@ -120,32 +139,58 @@ export function DraftLobbyBoard() {
   }, [joinedNames, memberLimit]);
 
   return (
-    <section className="space-y-8">
-      <h1 className="text-4xl font-bold text-slate-900">{leagueName} Draft Lobby</h1>
+    <section className="space-y-6">
+      <div className="space-y-3">
+        <h1 className="text-5xl font-bold tracking-tight text-slate-900">
+          {leagueName} Waiting Room
+        </h1>
+        <p className="max-w-3xl text-sm text-slate-600">
+          This is a private league with custom settings. The draft will begin at the scheduled time.
+          Make sure to review your pre-draft rankings and be ready when the timer reaches zero.
+        </p>
+      </div>
 
       <Card className="border border-slate-200 bg-slate-100 p-6 sm:p-8">
-        <div className="relative rounded-md border border-slate-200 bg-[#F3F4F6] px-4 py-5 text-center">
-          <p className="font-mono text-5xl font-black tracking-[0.05em] text-slate-900 sm:text-6xl">
-            {formatTimer(secondsLeft)}
-          </p>
-          <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
-            <Button
-              type="button"
-              className="h-8 rounded-sm bg-[#0E2A57] px-4 text-xs hover:bg-[#12336b]"
-              onClick={() =>
-                router.push(`/leagues-directory/pre-draft-rankings?leagueId=${leagueId}`)
-              }
-            >
-              Edit Pre-Draft Rankings
-            </Button>
-            <button
-              type="button"
-              className="text-xs text-sky-700 hover:text-sky-800"
-              onClick={() => router.push("/leagues-directory")}
-            >
-              Leave This League
-            </button>
-          </div>
+        <div className="relative rounded-md border border-slate-200 bg-[#F3F4F6] px-4 py-7 text-center">
+          {isDraftRoomOpen ? (
+            <>
+              <p className="text-4xl font-medium text-[#0E2A57]">The Draft room is now open!</p>
+              <Button
+                type="button"
+                className="absolute top-1/2 right-4 h-10 -translate-y-1/2 rounded-sm bg-[#0E2A57] px-8 text-base hover:bg-[#12336b]"
+                onClick={() => {
+                  setLeagueDraftStatus(leagueId, "drafting");
+                  router.push(`/leagues-directory/snake-draft?leagueId=${leagueId}`);
+                }}
+              >
+                Enter The Draft
+              </Button>
+            </>
+          ) : (
+            <>
+              <p className="font-mono text-5xl font-black tracking-[0.05em] text-slate-900 sm:text-6xl">
+                {formatTimer(secondsLeft)}
+              </p>
+              <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
+                <Button
+                  type="button"
+                  className="h-8 rounded-sm bg-[#0E2A57] px-4 text-xs hover:bg-[#12336b]"
+                  onClick={() =>
+                    router.push(`/leagues-directory/pre-draft-rankings?leagueId=${leagueId}`)
+                  }
+                >
+                  Edit Pre-Draft Rankings
+                </Button>
+                <button
+                  type="button"
+                  className="text-xs text-sky-700 hover:text-sky-800"
+                  onClick={() => router.push("/leagues-directory")}
+                >
+                  Leave This League
+                </button>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="mt-5 overflow-hidden border-2 border-[#1B9AF5] bg-white">
@@ -174,6 +219,19 @@ export function DraftLobbyBoard() {
                         {row.abbr === "---" ? "-" : row.abbr[0]}
                       </span>
                       <span>{row.teamName}</span>
+                      {row.teamName.startsWith(`${currentUserName}'s`) ? (
+                        <button
+                          type="button"
+                          className="text-xs text-blue-600 hover:text-blue-700"
+                          onClick={() =>
+                            router.push(
+                              `/leagues-directory/pre-draft-rankings?leagueId=${leagueId}`
+                            )
+                          }
+                        >
+                          (Edit Team Settings)
+                        </button>
+                      ) : null}
                     </div>
                   </td>
                   <td className="px-4 py-3 text-right text-xs font-semibold text-slate-700 uppercase">

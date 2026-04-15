@@ -8,7 +8,11 @@ import { Copy, Share2, Trophy } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
 
-import { joinLeagueLobby, upsertLeagueLobbyMeta } from "@/helpers/league-lobby";
+import {
+  joinLeagueLobby,
+  setLeagueDraftStatus,
+  upsertLeagueLobbyMeta
+} from "@/helpers/league-lobby";
 
 import {
   Button,
@@ -101,6 +105,7 @@ export function CreateLeagueForm() {
       name: values.leagueName,
       memberLimit: Number(values.leagueSize)
     });
+    setLeagueDraftStatus(leagueId, "waiting");
     joinLeagueLobby(leagueId);
 
     const payload = {

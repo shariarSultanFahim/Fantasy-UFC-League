@@ -8,8 +8,12 @@ export interface LeagueLobbyMeta {
   memberLimit: number;
 }
 
+export type LeagueDraftStatus = "waiting" | "open" | "drafting";
+
 const LOBBY_MEMBERS_KEY = "league-lobby-members";
 const LOBBY_META_KEY = "league-lobby-meta";
+const LOBBY_QUEUE_KEY = "league-lobby-queue";
+const LOBBY_STATUS_KEY = "league-lobby-status";
 
 function readStorage<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") {
@@ -90,4 +94,26 @@ export function joinLeagueLobby(leagueId: string, memberName = getCurrentLoggedI
 export function getJoinedLeagueMembers(leagueId: string) {
   const membersByLeague = readStorage<Record<string, LeagueLobbyMember[]>>(LOBBY_MEMBERS_KEY, {});
   return membersByLeague[leagueId] ?? [];
+}
+
+export function getLeagueQueue(leagueId: string) {
+  const queueByLeague = readStorage<Record<string, string[]>>(LOBBY_QUEUE_KEY, {});
+  return queueByLeague[leagueId] ?? [];
+}
+
+export function setLeagueQueue(leagueId: string, queue: string[]) {
+  const queueByLeague = readStorage<Record<string, string[]>>(LOBBY_QUEUE_KEY, {});
+  queueByLeague[leagueId] = queue;
+  writeStorage(LOBBY_QUEUE_KEY, queueByLeague);
+}
+
+export function getLeagueDraftStatus(leagueId: string): LeagueDraftStatus {
+  const statusByLeague = readStorage<Record<string, LeagueDraftStatus>>(LOBBY_STATUS_KEY, {});
+  return statusByLeague[leagueId] ?? "waiting";
+}
+
+export function setLeagueDraftStatus(leagueId: string, status: LeagueDraftStatus) {
+  const statusByLeague = readStorage<Record<string, LeagueDraftStatus>>(LOBBY_STATUS_KEY, {});
+  statusByLeague[leagueId] = status;
+  writeStorage(LOBBY_STATUS_KEY, statusByLeague);
 }

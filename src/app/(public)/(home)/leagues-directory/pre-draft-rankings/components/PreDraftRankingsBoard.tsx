@@ -2,8 +2,15 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 
 import { ChevronDown, ChevronUp, Clock3, GripVertical, Plus, Search, X } from "lucide-react";
+
+import type { LeagueFighter } from "@/types/league-simulation";
+
+import { getLeagueQueue, setLeagueQueue } from "@/helpers/league-lobby";
+
+import { LEAGUE_FIGHTERS } from "@/data/league-fighters";
 
 import { Button, Card, Input } from "@/components/ui";
 import {
@@ -14,82 +21,8 @@ import {
   SelectValue
 } from "@/components/ui/select";
 
-interface FighterEntry {
-  id: string;
-  name: string;
-  weightClass: string;
-  wins: number;
-  losses: number;
-  avgPoints: number;
-  rank: number;
-  avatarUrl: string;
-}
-
 const MAX_QUEUE_SIZE = 20;
 const PRE_DRAFT_SECONDS = 15 * 60 + 30;
-
-const FIGHTERS: FighterEntry[] = [
-  {
-    id: "f-001",
-    name: "Conor McGregor",
-    weightClass: "Featherweight",
-    wins: 2,
-    losses: 6,
-    avgPoints: 87.5,
-    rank: 1,
-    avatarUrl: "/demo.jpeg"
-  },
-  {
-    id: "f-002",
-    name: "Jon Jones",
-    weightClass: "Heavyweight",
-    wins: 4,
-    losses: 3,
-    avgPoints: 47.5,
-    rank: 2,
-    avatarUrl: "/demo.jpeg"
-  },
-  {
-    id: "f-003",
-    name: "Amanda Nunes",
-    weightClass: "Bantamweight",
-    wins: 3,
-    losses: 2,
-    avgPoints: 77.5,
-    rank: 3,
-    avatarUrl: "/demo.jpeg"
-  },
-  {
-    id: "f-004",
-    name: "Islam Makhachev",
-    weightClass: "Lightweight",
-    wins: 5,
-    losses: 1,
-    avgPoints: 95.1,
-    rank: 4,
-    avatarUrl: "/demo.jpeg"
-  },
-  {
-    id: "f-005",
-    name: "Valentina Shevchenko",
-    weightClass: "Flyweight",
-    wins: 4,
-    losses: 1,
-    avgPoints: 82.4,
-    rank: 5,
-    avatarUrl: "/demo.jpeg"
-  },
-  {
-    id: "f-006",
-    name: "Khabib Nurmagomedov",
-    weightClass: "Lightweight",
-    wins: 5,
-    losses: 0,
-    avgPoints: 91.2,
-    rank: 6,
-    avatarUrl: "/demo.jpeg"
-  }
-];
 
 function formatCountDown(totalSeconds: number) {
   const hours = Math.floor(totalSeconds / 3600);
@@ -100,12 +33,25 @@ function formatCountDown(totalSeconds: number) {
 }
 
 export function PreDraftRankingsBoard() {
+  const searchParams = useSearchParams();
+  const leagueId = searchParams.get("leagueId") ?? "instant-league";
+
   const [secondsLeft, setSecondsLeft] = useState(PRE_DRAFT_SECONDS);
   const [nameSearch, setNameSearch] = useState("");
   const [queueSearch, setQueueSearch] = useState("");
   const [weightClassFilter, setWeightClassFilter] = useState("all");
   const [rankFilter, setRankFilter] = useState("all");
-  const [queue, setQueue] = useState<string[]>(["f-001", "f-002", "f-003"]);
+  const [queue, setQueue] = useState<string[]>(() => {
+    const existingQueue = getLeagueQueue(leagueId);
+
+    if (existingQueue.length) {
+      return existingQueue;
+    }
+
+    const fallbackQueue = LEAGUE_FIGHTERS.slice(0, 3).map((fighter) => fighter.id);
+    setLeagueQueue(leagueId, fallbackQueue);
+    return fallbackQueue;
+  });
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -118,7 +64,7 @@ export function PreDraftRankingsBoard() {
   const queueFighterIdSet = useMemo(() => new Set(queue), [queue]);
 
   const availableFighters = useMemo(() => {
-    return FIGHTERS.filter((fighter) => {
+    return LEAGUE_FIGHTERS.filter((fighter) => {
       if (queueFighterIdSet.has(fighter.id)) {
         return false;
       }
@@ -128,8 +74,8 @@ export function PreDraftRankingsBoard() {
         weightClassFilter === "all" || fighter.weightClass.toLowerCase() === weightClassFilter;
       const matchesRank =
         rankFilter === "all" ||
-        (rankFilter === "top-3" && fighter.rank <= 3) ||
-        (rankFilter === "top-5" && fighter.rank <= 5);
+        (rankFilter === "top-3" && fighter.divisionRank <= 3) ||
+        (rankFilter === "top-5" && fighter.divisionRank <= 5);
 
       return matchesSearch && matchesWeightClass && matchesRank;
     });
@@ -137,8 +83,8 @@ export function PreDraftRankingsBoard() {
 
   const queueFighters = useMemo(() => {
     return queue
-      .map((id) => FIGHTERS.find((fighter) => fighter.id === id))
-      .filter((fighter): fighter is FighterEntry => Boolean(fighter))
+      .map((id) => LEAGUE_FIGHTERS.find((fighter) => fighter.id === id))
+      .filter((fighter): fighter is LeagueFighter => Boolean(fighter))
       .filter((fighter) => fighter.name.toLowerCase().includes(queueSearch.toLowerCase()));
   }, [queue, queueSearch]);
 
@@ -148,7 +94,9 @@ export function PreDraftRankingsBoard() {
         return previous;
       }
 
-      return [...previous, fighterId];
+      const updated = [...previous, fighterId];
+      setLeagueQueue(leagueId, updated);
+      return updated;
     });
   };
 
@@ -162,10 +110,17 @@ export function PreDraftRankingsBoard() {
     addToQueue(firstFighter.id);
   };
 
-  const clearQueue = () => setQueue([]);
+  const clearQueue = () => {
+    setLeagueQueue(leagueId, []);
+    setQueue([]);
+  };
 
   const removeFromQueue = (fighterId: string) => {
-    setQueue((previous) => previous.filter((id) => id !== fighterId));
+    setQueue((previous) => {
+      const updated = previous.filter((id) => id !== fighterId);
+      setLeagueQueue(leagueId, updated);
+      return updated;
+    });
   };
 
   const moveQueueItem = (fighterId: string, direction: "up" | "down") => {
@@ -187,6 +142,7 @@ export function PreDraftRankingsBoard() {
       updated[index] = updated[targetIndex] ?? current;
       updated[targetIndex] = current;
 
+      setLeagueQueue(leagueId, updated);
       return updated;
     });
   };
@@ -271,7 +227,7 @@ export function PreDraftRankingsBoard() {
                 className="grid grid-cols-[auto_1fr_auto] items-center gap-4 border-b border-slate-200 bg-[#f3f4f6] px-4 py-3 last:border-b-0 even:bg-[#e5e7eb]"
               >
                 <span className="inline-flex h-8 min-w-8 items-center justify-center rounded-full bg-slate-300 px-2 text-sm font-semibold text-slate-700">
-                  #{fighter.rank}
+                  #{fighter.divisionRank}
                 </span>
 
                 <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">

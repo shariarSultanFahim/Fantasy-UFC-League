@@ -7,7 +7,11 @@ import { useRouter } from "next/navigation";
 
 import type { LeagueLobbyEntry } from "@/types/league";
 
-import { joinLeagueLobby, upsertLeagueLobbyMeta } from "@/helpers/league-lobby";
+import {
+  joinLeagueLobby,
+  setLeagueDraftStatus,
+  upsertLeagueLobbyMeta
+} from "@/helpers/league-lobby";
 
 import { Button, Card } from "@/components/ui";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -44,6 +48,7 @@ export function LeaguesDatabase() {
       name: league.name,
       memberLimit: league.memberLimit
     });
+    setLeagueDraftStatus(league.id, "waiting");
     joinLeagueLobby(league.id);
     router.push(`/leagues-directory/draft-lobby?leagueId=${league.id}`);
   };
@@ -85,6 +90,7 @@ export function LeaguesDatabase() {
       name: INSTANT_LEAGUE_NAME,
       memberLimit: INSTANT_LEAGUE_MEMBER_LIMIT
     });
+    setLeagueDraftStatus(INSTANT_LEAGUE_ID, "waiting");
     joinLeagueLobby(INSTANT_LEAGUE_ID);
     router.push(`/leagues-directory/draft-lobby?leagueId=${INSTANT_LEAGUE_ID}`);
   };

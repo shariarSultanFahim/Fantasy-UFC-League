@@ -13,13 +13,14 @@ import {
 
 interface LeaguesTableProps {
   leagues: LeagueLobbyEntry[];
+  onActionClick: (league: LeagueLobbyEntry) => void;
 }
 
 function membersLabel(league: LeagueLobbyEntry) {
   return `${league.members}/${league.memberLimit}`;
 }
 
-export function LeaguesTable({ leagues }: LeaguesTableProps) {
+export function LeaguesTable({ leagues, onActionClick }: LeaguesTableProps) {
   return (
     <Card className="gap-0 py-0">
       <CardHeader className="px-5 py-5 sm:px-6">
@@ -53,7 +54,10 @@ export function LeaguesTable({ leagues }: LeaguesTableProps) {
                 </TableCell>
                 <TableCell className="py-4 pr-5 text-right sm:pr-6">
                   <Button
+                    type="button"
                     size="sm"
+                    disabled={league.actionStyle === "muted"}
+                    onClick={() => onActionClick(league)}
                     className={
                       league.actionStyle === "dark"
                         ? "h-8 rounded-md bg-[#0E172B] px-4 text-xs font-semibold hover:bg-[#16254A]"

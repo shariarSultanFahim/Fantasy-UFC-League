@@ -18,6 +18,7 @@ export interface LeagueLobbyEntry {
   id: string;
   name: string;
   hasPasscode: boolean;
+  passcode?: string;
   draftTime: string;
   members: number;
   memberLimit: number;

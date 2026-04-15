@@ -8,6 +8,8 @@ import { Copy, Share2, Trophy } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
 
+import { joinLeagueLobby, upsertLeagueLobbyMeta } from "@/helpers/league-lobby";
+
 import {
   Button,
   Card,
@@ -92,14 +94,24 @@ export function CreateLeagueForm() {
   };
 
   const onSubmit = (values: CreateLeagueFormValues) => {
+    const leagueId = toLeagueSlug(values.leagueName) || `league-${Date.now()}`;
+
+    upsertLeagueLobbyMeta({
+      id: leagueId,
+      name: values.leagueName,
+      memberLimit: Number(values.leagueSize)
+    });
+    joinLeagueLobby(leagueId);
+
     const payload = {
       ...values,
+      leagueId,
       inviteCode: INVITE_CODE,
       shareLink
     };
 
     void payload;
-    router.push("/leagues-directory");
+    router.push(`/leagues-directory/draft-lobby?leagueId=${leagueId}`);
   };
 
   return (

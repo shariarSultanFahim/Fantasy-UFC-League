@@ -132,6 +132,9 @@ export function DraftLobbyBoard() {
             <Button
               type="button"
               className="h-8 rounded-sm bg-[#0E2A57] px-4 text-xs hover:bg-[#12336b]"
+              onClick={() =>
+                router.push(`/leagues-directory/pre-draft-rankings?leagueId=${leagueId}`)
+              }
             >
               Edit Pre-Draft Rankings
             </Button>

@@ -1,8 +1,9 @@
 "use client";
 
-import { ImageUp, Scissors } from "lucide-react";
-import NextImage from "next/image";
 import * as React from "react";
+import NextImage from "next/image";
+
+import { ImageUp, Scissors } from "lucide-react";
 import Cropper, { type Area } from "react-easy-crop";
 
 import { Button } from "@/components/ui";
@@ -52,7 +53,11 @@ async function getCroppedImage(imageSrc: string, pixelCrop: Area) {
   return canvas.toDataURL("image/jpeg", 0.92);
 }
 
-export function EventPosterCropUploader({ value, onChange, disabled }: EventPosterCropUploaderProps) {
+export function EventPosterCropUploader({
+  value,
+  onChange,
+  disabled
+}: EventPosterCropUploaderProps) {
   const [sourceImage, setSourceImage] = React.useState("");
   const [crop, setCrop] = React.useState({ x: 0, y: 0 });
   const [zoom, setZoom] = React.useState(1);
@@ -125,7 +130,13 @@ export function EventPosterCropUploader({ value, onChange, disabled }: EventPost
           </div>
           <div className="space-y-2">
             <Label>Zoom</Label>
-            <Slider value={[zoom]} min={1} max={3} step={0.1} onValueChange={(value) => setZoom(value[0] ?? 1)} />
+            <Slider
+              value={[zoom]}
+              min={1}
+              max={3}
+              step={0.1}
+              onValueChange={(value) => setZoom(value[0] ?? 1)}
+            />
           </div>
           <Button type="button" onClick={handleApplyCrop} className="w-full sm:w-auto">
             <Scissors className="size-4" />
@@ -138,11 +149,18 @@ export function EventPosterCropUploader({ value, onChange, disabled }: EventPost
         <div className="space-y-2">
           <Label>Poster Preview</Label>
           <div className="relative aspect-video w-full max-w-2xl overflow-hidden rounded-lg border">
-            <NextImage src={value} alt="Event poster preview" fill unoptimized className="object-cover" />
+            <NextImage
+              src={value}
+              alt="Event poster preview"
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1280px) 80vw, 896px"
+              unoptimized
+              className="object-cover"
+            />
           </div>
         </div>
       ) : (
-        <div className="text-muted-foreground flex aspect-video w-full max-w-2xl items-center justify-center rounded-lg border border-dashed text-xs">
+        <div className="flex aspect-video w-full max-w-2xl items-center justify-center rounded-lg border border-dashed text-xs text-muted-foreground">
           <div className="flex flex-col items-center gap-2 text-center">
             <ImageUp className="size-5" />
             <p>No poster selected</p>

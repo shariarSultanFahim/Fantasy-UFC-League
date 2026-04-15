@@ -3,7 +3,8 @@ export const articleCards = [
     title: "Predicted top finishes for fighters in upcoming MMA season...",
     description:
       "Every injury you need to dominate your MMA league. From striking accuracy stats to takedown defense metrics and training camp rumors.",
-    imageSrc: "/demo.jpeg"
+    imageSrc: "/demo.jpeg",
+    priority: true
   },
   {
     title: "Islam Makhachev and Leon Edwards among must-draft players",

@@ -34,7 +34,7 @@ export function RankingsFiltersSheet({
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" size="icon" aria-label="Open filters">
+        <Button variant="outline" size="icon-xl" aria-label="Open filters">
           <SlidersHorizontal className="size-4" />
         </Button>
       </SheetTrigger>

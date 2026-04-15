@@ -1,14 +1,16 @@
 import { z } from "zod";
 
-export const LEAGUE_SIZE_OPTIONS = ["8", "10", "12", "16"] as const;
+export const LEAGUE_SIZE_OPTIONS = Array.from({ length: 13 }, (_, index) => String(index + 4));
 export const DRAFT_TYPE_OPTIONS = ["snake", "auction"] as const;
-export const PICK_TIME_LIMIT_OPTIONS = ["30", "45", "60", "90"] as const;
+export const PICK_TIME_LIMIT_OPTIONS = Array.from({ length: 15 }, (_, index) =>
+  String(30 + index * 15)
+);
 
 export const createLeagueFormSchema = z
   .object({
     leagueName: z.string().trim().min(3, "League name must be at least 3 characters."),
-    leagueSize: z.enum(LEAGUE_SIZE_OPTIONS, {
-      error: "Select a league size."
+    leagueSize: z.string().refine((value) => LEAGUE_SIZE_OPTIONS.includes(value), {
+      message: "Select a league size."
     }),
     leagueType: z.enum(["public", "private"], {
       error: "Select a league type."
@@ -18,8 +20,8 @@ export const createLeagueFormSchema = z
     }),
     draftDate: z.string().min(1, "Draft date is required."),
     draftTime: z.string().min(1, "Draft time is required."),
-    pickTimeLimit: z.enum(PICK_TIME_LIMIT_OPTIONS, {
-      error: "Select a pick time limit."
+    pickTimeLimit: z.string().refine((value) => PICK_TIME_LIMIT_OPTIONS.includes(value), {
+      message: "Select a pick time limit."
     }),
     passcode: z.string().optional()
   })

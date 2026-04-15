@@ -25,13 +25,6 @@ import {
   FormMessage,
   Input
 } from "@/components/ui";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
 
 import {
   createLeagueFormSchema,
@@ -39,6 +32,7 @@ import {
   PICK_TIME_LIMIT_OPTIONS,
   type CreateLeagueFormValues
 } from "../schema/create-league-form-schema";
+import { CreateLeagueCombobox } from "./CreateLeagueCombobox";
 
 const INVITE_CODE = "MMA2026";
 
@@ -52,6 +46,16 @@ const defaultValues: CreateLeagueFormValues = {
   pickTimeLimit: "60",
   passcode: ""
 };
+
+const leagueSizeOptions = LEAGUE_SIZE_OPTIONS.map((option) => ({
+  value: option,
+  label: `${option} Participants`
+}));
+
+const pickTimeLimitOptions = PICK_TIME_LIMIT_OPTIONS.map((option) => ({
+  value: option,
+  label: `${option} sec`
+}));
 
 function toLeagueSlug(leagueName: string) {
   return leagueName
@@ -98,7 +102,7 @@ export function CreateLeagueForm() {
   };
 
   const onSubmit = (values: CreateLeagueFormValues) => {
-    const leagueId = toLeagueSlug(values.leagueName) || `league-${Date.now()}`;
+    const leagueId = toLeagueSlug(values.leagueName) || "league-custom";
 
     upsertLeagueLobbyMeta({
       id: leagueId,
@@ -172,20 +176,15 @@ export function CreateLeagueForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>League Size</FormLabel>
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <FormControl>
-                          <SelectTrigger className="w-full bg-white">
-                            <SelectValue placeholder="Select size" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {LEAGUE_SIZE_OPTIONS.map((option) => (
-                            <SelectItem key={option} value={option}>
-                              {option} Participants
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <CreateLeagueCombobox
+                          value={field.value}
+                          options={leagueSizeOptions}
+                          placeholder="Select size"
+                          searchPlaceholder="Search league size..."
+                          onValueChange={field.onChange}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -286,20 +285,15 @@ export function CreateLeagueForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Pick Time Limit</FormLabel>
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <FormControl>
-                          <SelectTrigger className="w-full bg-white">
-                            <SelectValue placeholder="Select timer" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {PICK_TIME_LIMIT_OPTIONS.map((option) => (
-                            <SelectItem key={option} value={option}>
-                              {option}s
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <CreateLeagueCombobox
+                          value={field.value}
+                          options={pickTimeLimitOptions}
+                          placeholder="Select timer"
+                          searchPlaceholder="Search time limit..."
+                          onValueChange={field.onChange}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -327,13 +321,13 @@ export function CreateLeagueForm() {
                 />
               ) : null}
 
-              <div className="grid gap-4 border-t border-slate-200 pt-6 md:grid-cols-[160px_1fr_auto_auto] md:items-end">
-                <div>
+              <div className="grid gap-4 border-t border-slate-200 pt-6 md:grid-cols-[1fr_auto_auto] md:items-end">
+                {/* <div>
                   <p className="mb-2 text-sm font-medium text-slate-700">Invite Code</p>
                   <div className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold tracking-[0.2em] text-[#0E2A57] uppercase">
                     {INVITE_CODE}
                   </div>
-                </div>
+                </div> */}
 
                 <div>
                   <p className="mb-2 text-sm font-medium text-slate-700">Share Link</p>

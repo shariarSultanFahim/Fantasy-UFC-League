@@ -1,6 +1,15 @@
 import { z } from "zod";
 
+import { SCORING_CRITERIA } from "@/constants/scoring-criteria";
+
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+
+const scoringCriteriaSchema = z.object(
+  Object.fromEntries(SCORING_CRITERIA.map((criterion) => [criterion.key, z.boolean()])) as Record<
+    (typeof SCORING_CRITERIA)[number]["key"],
+    z.ZodBoolean
+  >
+);
 
 const boutFormSchema = z
   .object({
@@ -13,7 +22,8 @@ const boutFormSchema = z
       .max(5, "Rounds must be 5 or lower."),
     isMainEvent: z.boolean(),
     isCoMainEvent: z.boolean(),
-    winnerId: z.string().trim()
+    winnerId: z.string().trim(),
+    scoringCriteria: scoringCriteriaSchema
   })
   .superRefine((bout, context) => {
     if (bout.fighter1Id && bout.fighter2Id && bout.fighter1Id === bout.fighter2Id) {
@@ -93,6 +103,16 @@ export function getEventFormSchema(mode: "create" | "edit") {
             code: z.ZodIssueCode.custom,
             message: "Winner must be one of the selected fighters.",
             path: ["bouts", index, "winnerId"]
+          });
+        }
+
+        const hasSelectedCriteria = Object.values(bout.scoringCriteria).some(Boolean);
+
+        if (!hasSelectedCriteria) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Select at least one scoring criteria for this winner.",
+            path: ["bouts", index, "scoringCriteria"]
           });
         }
       });

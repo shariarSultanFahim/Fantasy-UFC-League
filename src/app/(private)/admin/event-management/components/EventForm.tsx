@@ -1,25 +1,28 @@
 "use client";
 
+import { Plus, Rocket, X } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Rocket } from "lucide-react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
+import { SCORING_CRITERIA } from "@/constants/scoring-criteria";
+
 import {
-    Button,
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-    Input
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input
 } from "@/components/ui";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import type { Event, EventBoutFormValue } from "@/types";
 
 import { FIGHTERS_DATA } from "../../fighters/components/fighters-data";
@@ -43,6 +46,12 @@ const weightClassOptions = WEIGHT_CLASS_OPTIONS.map((weightClass) => ({
   label: weightClass
 }));
 
+function getDefaultScoringCriteria(): EventBoutFormValue["scoringCriteria"] {
+  return Object.fromEntries(
+    SCORING_CRITERIA.map((criterion) => [criterion.key, false])
+  ) as EventBoutFormValue["scoringCriteria"];
+}
+
 function emptyBout(): EventBoutFormValue {
   return {
     fighter1Id: "",
@@ -51,7 +60,8 @@ function emptyBout(): EventBoutFormValue {
     rounds: 3,
     isMainEvent: false,
     isCoMainEvent: false,
-    winnerId: ""
+    winnerId: "",
+    scoringCriteria: getDefaultScoringCriteria()
   };
 }
 
@@ -78,7 +88,8 @@ function toDefaultValues(initialEvent?: Event): EventFormValues {
       rounds: bout.rounds,
       isMainEvent: bout.isMainEvent,
       isCoMainEvent: bout.isCoMainEvent,
-      winnerId: bout.winnerId ?? ""
+      winnerId: bout.winnerId ?? "",
+      scoringCriteria: bout.scoringCriteria ?? getDefaultScoringCriteria()
     }))
   };
 }
@@ -91,7 +102,7 @@ export function EventForm({ mode, initialEvent }: EventFormProps) {
     defaultValues: toDefaultValues(initialEvent)
   });
 
-  const { fields, append } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "bouts"
   });
@@ -128,7 +139,11 @@ export function EventForm({ mode, initialEvent }: EventFormProps) {
                   <FormItem className="lg:col-span-2">
                     <FormLabel>Event Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. UFC 306: Du Plessis vs Adesanya" {...field} disabled={isEditMode} />
+                      <Input
+                        placeholder="e.g. UFC 306: Du Plessis vs Adesanya"
+                        {...field}
+                        disabled={isEditMode}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -171,9 +186,31 @@ export function EventForm({ mode, initialEvent }: EventFormProps) {
                 {fields.map((field, index) => {
                   const fighterOneId = watchedBouts?.[index]?.fighter1Id ?? "";
                   const fighterTwoId = watchedBouts?.[index]?.fighter2Id ?? "";
+                  const scoringCriteriaError =
+                    (
+                      form.formState.errors.bouts?.[index] as
+                        | { scoringCriteria?: { message?: string } }
+                        | undefined
+                    )?.scoringCriteria?.message ?? "";
 
                   return (
                     <div key={field.id} className="space-y-4 rounded-lg border bg-muted/20 p-4">
+                      {!isEditMode ? (
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-semibold text-slate-900">Bout {index + 1}</p>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="hover:bg-red-300"
+                            size="sm"
+                            onClick={() => remove(index)}
+                            disabled={fields.length === 1}
+                          >
+                            <X className="size-4 text-red-500" />
+                          </Button>
+                        </div>
+                      ) : null}
+
                       <div className="grid gap-4 lg:grid-cols-2">
                         <FormField
                           control={form.control}
@@ -252,7 +289,9 @@ export function EventForm({ mode, initialEvent }: EventFormProps) {
                                   min={1}
                                   max={5}
                                   value={boutField.value}
-                                  onChange={(event) => boutField.onChange(Number(event.target.value))}
+                                  onChange={(event) =>
+                                    boutField.onChange(Number(event.target.value))
+                                  }
                                   disabled={isEditMode}
                                 />
                               </FormControl>
@@ -297,7 +336,6 @@ export function EventForm({ mode, initialEvent }: EventFormProps) {
                           )}
                         />
                       </div>
-
                       {isEditMode ? (
                         <FormField
                           control={form.control}
@@ -310,7 +348,9 @@ export function EventForm({ mode, initialEvent }: EventFormProps) {
                                   value={boutField.value}
                                   onValueChange={boutField.onChange}
                                   options={fighterOptions.filter(
-                                    (fighter) => fighter.value === fighterOneId || fighter.value === fighterTwoId
+                                    (fighter) =>
+                                      fighter.value === fighterOneId ||
+                                      fighter.value === fighterTwoId
                                   )}
                                   placeholder="Select winner"
                                   searchPlaceholder="Search winner..."
@@ -321,13 +361,65 @@ export function EventForm({ mode, initialEvent }: EventFormProps) {
                           )}
                         />
                       ) : null}
+
+                      {isEditMode ? (
+                        <div className="space-y-3 rounded-lg bg-card p-3">
+                          <div>
+                            <p className="text-sm font-semibold text-slate-900">Scoring Criteria</p>
+                            <p className="text-xs text-slate-600">
+                              Toggle all criteria that should apply to this winner.
+                            </p>
+                          </div>
+
+                          <div className="grid gap-2 space-y-2 lg:grid-cols-2">
+                            {SCORING_CRITERIA.map((criterion) => (
+                              <FormField
+                                key={criterion.key}
+                                control={form.control}
+                                name={`bouts.${index}.scoringCriteria.${criterion.key}`}
+                                render={({ field: criterionField }) => (
+                                  <FormItem className="rounded-md border bg-muted/30 p-2">
+                                    <div className="flex items-center justify-between gap-2">
+                                      <div>
+                                        <FormLabel className="text-sm font-medium">
+                                          {criterion.title}
+                                        </FormLabel>
+                                        <p className="text-xs text-slate-600">
+                                          {criterion.description}
+                                        </p>
+                                      </div>
+                                      <FormControl>
+                                        <Switch
+                                          checked={criterionField.value}
+                                          onCheckedChange={(value) =>
+                                            criterionField.onChange(Boolean(value))
+                                          }
+                                        />
+                                      </FormControl>
+                                    </div>
+                                  </FormItem>
+                                )}
+                              />
+                            ))}
+                          </div>
+
+                          {scoringCriteriaError ? (
+                            <p className="text-sm text-destructive">{scoringCriteriaError}</p>
+                          ) : null}
+                        </div>
+                      ) : null}
                     </div>
                   );
                 })}
               </div>
 
               {!isEditMode ? (
-                <Button type="button" variant="outline" className="w-full" onClick={() => append(emptyBout())}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => append(emptyBout())}
+                >
                   <Plus className="size-4" />
                   Add Another Bout
                 </Button>
@@ -340,7 +432,11 @@ export function EventForm({ mode, initialEvent }: EventFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <EventPosterCropUploader value={field.value} onChange={field.onChange} disabled={isEditMode} />
+                    <EventPosterCropUploader
+                      value={field.value}
+                      onChange={field.onChange}
+                      disabled={isEditMode}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

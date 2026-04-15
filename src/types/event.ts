@@ -1,4 +1,8 @@
+import type { ScoringSettings } from "./scoring";
+
 export type EventStatus = "upcoming" | "ongoing" | "completed";
+
+export type EventBoutScoringCriteria = Record<keyof ScoringSettings, boolean>;
 
 export interface EventFighterSnapshot {
   id: string;
@@ -17,6 +21,7 @@ export interface EventBout {
   isMainEvent: boolean;
   isCoMainEvent: boolean;
   winnerId: string | null;
+  scoringCriteria?: EventBoutScoringCriteria;
 }
 
 export interface Event {
@@ -37,6 +42,7 @@ export interface EventBoutFormValue {
   isMainEvent: boolean;
   isCoMainEvent: boolean;
   winnerId: string;
+  scoringCriteria: EventBoutScoringCriteria;
 }
 
 export interface EventFormValues {

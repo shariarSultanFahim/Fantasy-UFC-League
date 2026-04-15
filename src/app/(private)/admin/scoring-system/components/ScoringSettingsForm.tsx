@@ -16,6 +16,8 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
+import { SCORING_CRITERIA } from "@/constants/scoring-criteria";
+
 import {
   Button,
   Card,
@@ -51,66 +53,30 @@ const scoringFields: Array<{
   description: string;
   icon: React.ComponentType<{ className?: string }>;
 }> = [
-  {
-    name: "winPoints",
-    title: "Win Points",
-    description: "Base points awarded for a victory.",
-    icon: Shield
-  },
-  {
-    name: "koTkoBonus",
-    title: "KO/TKO Bonus",
-    description: "Additional points for knockout wins.",
-    icon: Sparkles
-  },
-  {
-    name: "finishBonus",
-    title: "Finish Bonus",
-    description: "Extra points for submission or stoppage.",
-    icon: BadgePlus
-  },
-  {
-    name: "decisionWin",
-    title: "Decision Win",
-    description: "Points for wins by judges decision.",
-    icon: Scale
-  },
-  {
-    name: "winningChampionshipBout",
-    title: "Winning Championship Bout",
-    description: "Bonus points for title fight victories.",
-    icon: Crown
-  },
-  {
-    name: "nonChampionshipFight",
-    title: "Non Championship Fight",
-    description: "Points for a standard non-title win.",
-    icon: Swords
-  },
-  {
-    name: "winningAgainstRankedOpponent",
-    title: "Winning Against Ranked Opponent",
-    description: "Bonus for defeating a ranked fighter.",
-    icon: Gauge
-  },
-  {
-    name: "fightingUnrankedOpponent",
-    title: "Fighting Unranked Opponent",
-    description: "Adjuster for matches versus unranked fighters.",
-    icon: Handshake
-  },
-  {
-    name: "winningFiveRoundFight",
-    title: "Winning a 5 Round Fight",
-    description: "Extra points for five-round victories.",
-    icon: BookCheck
-  },
-  {
-    name: "threeRoundFight",
-    title: "3 Round Fight",
-    description: "Adjuster for standard three-round fights.",
-    icon: Scale
-  }
+  ...SCORING_CRITERIA.map((criterion) => {
+    const iconByCriteria: Record<
+      keyof ScoringSettings,
+      React.ComponentType<{ className?: string }>
+    > = {
+      winPoints: Shield,
+      koTkoBonus: Sparkles,
+      finishBonus: BadgePlus,
+      decisionWin: Scale,
+      winningChampionshipBout: Crown,
+      nonChampionshipFight: Swords,
+      winningAgainstRankedOpponent: Gauge,
+      fightingUnrankedOpponent: Handshake,
+      winningFiveRoundFight: BookCheck,
+      threeRoundFight: Scale
+    };
+
+    return {
+      name: criterion.key,
+      title: criterion.title,
+      description: criterion.description,
+      icon: iconByCriteria[criterion.key]
+    };
+  })
 ];
 
 export function ScoringSettingsForm() {

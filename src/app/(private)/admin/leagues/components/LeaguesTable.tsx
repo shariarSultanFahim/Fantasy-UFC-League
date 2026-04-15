@@ -1,4 +1,6 @@
-import { MoreVertical } from "lucide-react";
+import Link from "next/link";
+
+import { Eye, MoreVertical } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -170,9 +172,19 @@ export function LeaguesTable({ leagues }: LeaguesTableProps) {
                   </TableCell>
 
                   <TableCell className="py-4 pr-5 text-right sm:pr-6">
-                    <Button variant="ghost" size="icon-sm" aria-label="Open league actions">
-                      <MoreVertical className="size-4" />
-                    </Button>
+                    <div className="flex items-center justify-end gap-1">
+                      <Button variant="ghost" size="icon-sm" asChild>
+                        <Link
+                          href={`/admin/draft-management?leagueId=${league.id}`}
+                          aria-label="Open draft management"
+                        >
+                          <Eye className="size-4" />
+                        </Link>
+                      </Button>
+                      <Button variant="ghost" size="icon-sm" aria-label="Open league actions">
+                        <MoreVertical className="size-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               );

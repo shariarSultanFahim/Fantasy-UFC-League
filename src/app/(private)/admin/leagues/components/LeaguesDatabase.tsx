@@ -19,7 +19,7 @@ import type { LeagueStatus } from "@/types";
 import { LEAGUES_DATA } from "./leagues-data";
 import { LeaguesTable } from "./LeaguesTable";
 
-const PAGE_SIZE = 4;
+const PAGE_SIZE = 10;
 
 const FILTER_OPTIONS: Array<{ label: string; value: "all" | LeagueStatus }> = [
   { label: "All", value: "all" },
@@ -30,7 +30,7 @@ const FILTER_OPTIONS: Array<{ label: string; value: "all" | LeagueStatus }> = [
 
 export function LeaguesDatabase() {
   const [query, setQuery] = React.useState("");
-  const [status, setStatus] = React.useState<"all" | LeagueStatus>("active");
+  const [status, setStatus] = React.useState<"all" | LeagueStatus>("all");
   const [page, setPage] = React.useState(1);
 
   const filteredLeagues = React.useMemo(() => {

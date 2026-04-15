@@ -1,16 +1,11 @@
-import { AdminPageHeader } from "../components/AdminPageHeader";
-import { DraftHistoryDatabase } from "./components/DraftHistoryDatabase";
-import { DraftOverviewSection } from "./components/DraftOverviewSection";
+import { DraftManagementView } from "./components/DraftManagementView";
 
-export default function DraftManagementPage() {
-  return (
-    <section className="space-y-6">
-      <AdminPageHeader
-        title="Draft Management"
-        subtitle="Control draft rooms, picks, and draft settings"
-      />
-      <DraftOverviewSection />
-      <DraftHistoryDatabase />
-    </section>
-  );
+interface DraftManagementPageProps {
+  searchParams: Promise<{ leagueId?: string; teamId?: string }>;
+}
+
+export default async function DraftManagementPage({ searchParams }: DraftManagementPageProps) {
+  const { leagueId, teamId } = await searchParams;
+
+  return <DraftManagementView leagueId={leagueId} teamId={teamId} />;
 }

@@ -41,6 +41,7 @@ export const DRAFT_TEAMS: DraftTeam[] = [
 export const DRAFT_PICKS: DraftPickHistory[] = [
   {
     id: "pick-411",
+    leagueId: "88295",
     pickNo: "4.11",
     fighterName: "Charles Oliveira",
     fighterImageUrl: "/demo.jpeg",
@@ -51,6 +52,7 @@ export const DRAFT_PICKS: DraftPickHistory[] = [
   },
   {
     id: "pick-410",
+    leagueId: "88295",
     pickNo: "4.10",
     fighterName: "Dustin Poirier",
     fighterImageUrl: "/demo.jpeg",
@@ -61,6 +63,7 @@ export const DRAFT_PICKS: DraftPickHistory[] = [
   },
   {
     id: "pick-409",
+    leagueId: "88295",
     pickNo: "4.09",
     fighterName: "Sean O'Malley",
     fighterImageUrl: "/demo.jpeg",
@@ -71,6 +74,7 @@ export const DRAFT_PICKS: DraftPickHistory[] = [
   },
   {
     id: "pick-408",
+    leagueId: "88295",
     pickNo: "4.08",
     fighterName: "Amanda Nunes",
     fighterImageUrl: "/demo.jpeg",
@@ -81,6 +85,7 @@ export const DRAFT_PICKS: DraftPickHistory[] = [
   },
   {
     id: "pick-307",
+    leagueId: "88310",
     pickNo: "3.07",
     fighterName: "Jon Jones",
     fighterImageUrl: "/demo.jpeg",
@@ -91,6 +96,7 @@ export const DRAFT_PICKS: DraftPickHistory[] = [
   },
   {
     id: "pick-306",
+    leagueId: "88310",
     pickNo: "3.06",
     fighterName: "Islam Makhachev",
     fighterImageUrl: "/demo.jpeg",
@@ -101,6 +107,7 @@ export const DRAFT_PICKS: DraftPickHistory[] = [
   },
   {
     id: "pick-305",
+    leagueId: "88310",
     pickNo: "3.05",
     fighterName: "Leon Edwards",
     fighterImageUrl: "/demo.jpeg",
@@ -111,6 +118,7 @@ export const DRAFT_PICKS: DraftPickHistory[] = [
   },
   {
     id: "pick-304",
+    leagueId: "88310",
     pickNo: "3.04",
     fighterName: "Alex Pereira",
     fighterImageUrl: "/demo.jpeg",

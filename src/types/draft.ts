@@ -8,6 +8,7 @@ export interface DraftTeam {
 
 export interface DraftPickHistory {
   id: string;
+  leagueId: string;
   pickNo: string;
   fighterName: string;
   fighterImageUrl: string;

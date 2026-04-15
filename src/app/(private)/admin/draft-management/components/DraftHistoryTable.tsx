@@ -1,3 +1,7 @@
+import Link from "next/link";
+
+import { Eye } from "lucide-react";
+
 import {
   Button,
   Card,
@@ -47,9 +51,9 @@ export function DraftHistoryTable({ picks }: DraftHistoryTableProps) {
               <TableHead className="text-xs font-semibold tracking-[0.14em] text-slate-500 uppercase">
                 Pick Time
               </TableHead>
-              {/* <TableHead className="pr-5 text-right text-xs font-semibold tracking-[0.14em] text-slate-500 uppercase sm:pr-6">
+              <TableHead className="pr-5 text-right text-xs font-semibold tracking-[0.14em] text-slate-500 uppercase sm:pr-6">
                 Action
-              </TableHead> */}
+              </TableHead>
             </TableRow>
           </TableHeader>
 
@@ -87,27 +91,16 @@ export function DraftHistoryTable({ picks }: DraftHistoryTableProps) {
                 <TableCell className="py-4 text-slate-700">{pick.teamName}</TableCell>
                 <TableCell className="py-4 text-slate-700">Round {pick.round}</TableCell>
                 <TableCell className="py-4 text-slate-700">{pick.pickTime}</TableCell>
-                {/* 
                 <TableCell className="py-4 pr-5 text-right sm:pr-6">
-                  <div className="flex items-center justify-end gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      type="button"
-                      aria-label="View pick details"
+                  <Button variant="ghost" size="icon-sm" asChild>
+                    <Link
+                      href={`/admin/draft-management?leagueId=${pick.leagueId}`}
+                      aria-label="Open league draft management"
                     >
-                      <ListChecks className="size-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      type="button"
-                      aria-label="Edit draft pick"
-                    >
-                      <PenSquare className="size-4" />
-                    </Button>
-                  </div>
-                </TableCell> */}
+                      <Eye className="size-4" />
+                    </Link>
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

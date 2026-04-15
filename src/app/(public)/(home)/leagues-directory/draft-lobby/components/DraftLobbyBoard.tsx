@@ -167,11 +167,11 @@ export function DraftLobbyBoard() {
               </Button>
             </>
           ) : (
-            <>
-              <p className="font-mono text-5xl font-black tracking-[0.05em] text-slate-900 sm:text-6xl">
+            <div className="flex flex-col justify-between gap-2 md:flex-row">
+              <p className="flex-1 font-mono text-4xl font-black text-slate-900 sm:text-6xl md:text-5xl">
                 {formatTimer(secondsLeft)}
               </p>
-              <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
+              <div className="flex flex-col justify-center gap-2">
                 <Button
                   type="button"
                   className="h-8 rounded-sm bg-[#0E2A57] px-4 text-xs hover:bg-[#12336b]"
@@ -189,7 +189,7 @@ export function DraftLobbyBoard() {
                   Leave This League
                 </button>
               </div>
-            </>
+            </div>
           )}
         </div>
 

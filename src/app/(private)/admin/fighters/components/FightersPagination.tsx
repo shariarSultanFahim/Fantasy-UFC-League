@@ -1,13 +1,13 @@
 "use client";
 
 import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious
 } from "@/components/ui";
 
 interface FightersPaginationProps {
@@ -55,7 +55,12 @@ function buildPaginationTokens(page: number, totalPage: number): PaginationToken
   return tokens;
 }
 
-export function FightersPagination({ page, limit, totalPage, onPageChange }: FightersPaginationProps) {
+export function FightersPagination({
+  page,
+  limit,
+  totalPage,
+  onPageChange
+}: FightersPaginationProps) {
   const tokens = buildPaginationTokens(page, totalPage);
 
   return (
@@ -67,6 +72,7 @@ export function FightersPagination({ page, limit, totalPage, onPageChange }: Fig
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
+              size="sm"
               onClick={() => onPageChange(Math.max(page - 1, 1))}
               disabled={page === 1}
             />
@@ -83,7 +89,11 @@ export function FightersPagination({ page, limit, totalPage, onPageChange }: Fig
 
             return (
               <PaginationItem key={token}>
-                <PaginationLink isActive={token === page} onClick={() => onPageChange(token)}>
+                <PaginationLink
+                  size="sm"
+                  isActive={token === page}
+                  onClick={() => onPageChange(token)}
+                >
                   {token}
                 </PaginationLink>
               </PaginationItem>
@@ -92,6 +102,7 @@ export function FightersPagination({ page, limit, totalPage, onPageChange }: Fig
 
           <PaginationItem>
             <PaginationNext
+              size="sm"
               onClick={() => onPageChange(Math.min(page + 1, totalPage))}
               disabled={page === totalPage}
             />

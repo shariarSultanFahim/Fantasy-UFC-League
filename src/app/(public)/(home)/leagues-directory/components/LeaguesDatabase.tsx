@@ -62,7 +62,7 @@ export function LeaguesDatabase() {
     setPage(1);
   }, [activeView]);
 
-  const leaguesToDisplay = React.useMemo(() => {
+  const leaguesToDisplay = React.useMemo<LeagueLobbyEntry[]>(() => {
     if (activeView === "all") {
       return allLeagues;
     }
@@ -70,13 +70,16 @@ export function LeaguesDatabase() {
     const joinedLeagues = new Set(myLeagueIds);
     return allLeagues
       .filter((league) => joinedLeagues.has(league.id))
-      .map((league) => ({
-        ...league,
-        actionLabel: "View",
-        actionStyle: "dark",
-        hasPasscode: false,
-        passcode: undefined
-      }));
+      .map(
+        (league) =>
+          ({
+            ...league,
+            actionLabel: "View",
+            actionStyle: "dark",
+            hasPasscode: false,
+            passcode: undefined
+          }) satisfies LeagueLobbyEntry
+      );
   }, [activeView, allLeagues, myLeagueIds]);
 
   React.useEffect(() => {

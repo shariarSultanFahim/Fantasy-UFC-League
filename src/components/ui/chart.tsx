@@ -28,8 +28,15 @@ const ChartContainer = React.forwardRef<HTMLDivElement, ChartContainerProps>(
     }, {});
 
     return (
-      <div ref={ref} className={cn("h-56 w-full", className)} style={style} {...props}>
-        <ResponsiveContainer>{children}</ResponsiveContainer>
+      <div
+        ref={ref}
+        className={cn("h-56 min-h-0 w-full min-w-0", className)}
+        style={style}
+        {...props}
+      >
+        <ResponsiveContainer width="100%" height="100%">
+          {children}
+        </ResponsiveContainer>
       </div>
     );
   }
@@ -37,6 +44,8 @@ const ChartContainer = React.forwardRef<HTMLDivElement, ChartContainerProps>(
 ChartContainer.displayName = "ChartContainer";
 
 type ChartTooltipContentProps = TooltipProps<number, string> & {
+  payload?: Array<{ dataKey?: string | number; value: number }>;
+  label?: string;
   config?: ChartConfig;
 };
 

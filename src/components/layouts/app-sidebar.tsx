@@ -28,8 +28,7 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarRail
+  SidebarMenuItem
 } from "@/components/ui/sidebar";
 
 import { Button } from "../ui";
@@ -176,8 +175,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
                 <div>
-                  <h2 className="font-semibold">John Doe</h2>
-                  <h3 className="text-sm text-gray-500">john@riseimpact.com</h3>
+                  <h2 className="font-semibold">Gabriel</h2>
+                  <h3 className="text-sm text-gray-500">gabriel@fantasyufc.com</h3>
                 </div>
               </div>
             </div>
@@ -185,6 +184,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <Button
                 variant="outline"
                 className="w-full border-secondary bg-transparent group-data-[collapsible=icon]:p-0"
+                onClick={() => (window.location.href = "/")}
               >
                 <LogOut className="size-4 group-data-[collapsible=icon]:h-5 group-data-[collapsible=icon]:w-5" />
                 <span className="group-data-[collapsible=icon]:hidden">Sign Out</span>
@@ -193,7 +193,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-      <SidebarRail />
+      {/* <SidebarRail /> */}
     </Sidebar>
   );
 }

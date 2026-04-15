@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { Eye, MoreVertical } from "lucide-react";
+import { Eye } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -181,9 +181,9 @@ export function LeaguesTable({ leagues }: LeaguesTableProps) {
                           <Eye className="size-4" />
                         </Link>
                       </Button>
-                      <Button variant="ghost" size="icon-sm" aria-label="Open league actions">
+                      {/* <Button variant="ghost" size="icon-sm" aria-label="Open league actions">
                         <MoreVertical className="size-4" />
-                      </Button>
+                      </Button> */}
                     </div>
                   </TableCell>
                 </TableRow>

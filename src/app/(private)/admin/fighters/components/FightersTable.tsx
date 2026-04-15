@@ -1,16 +1,16 @@
 import Link from "next/link";
 
 import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Fighter } from "@/types";
@@ -36,7 +36,7 @@ export function FightersTable({ fighters }: FightersTableProps) {
               <TableHead className="px-5 py-3 sm:px-6">Fighter</TableHead>
               <TableHead>Division</TableHead>
               <TableHead>Record</TableHead>
-              <TableHead>Points</TableHead>
+              <TableHead>Avg Points</TableHead>
               <TableHead>Rank</TableHead>
               <TableHead className="pr-5 text-right sm:pr-6">Action</TableHead>
             </TableRow>
@@ -55,9 +55,11 @@ export function FightersTable({ fighters }: FightersTableProps) {
                 </TableCell>
                 <TableCell className="py-4">{fighter.division}</TableCell>
                 <TableCell className="py-4">{recordLabel(fighter)}</TableCell>
-                <TableCell className="py-4 font-medium">{fighter.points.toLocaleString()}</TableCell>
+                <TableCell className="py-4 font-medium">
+                  {fighter.points.toLocaleString()}
+                </TableCell>
                 <TableCell className="py-4">{fighter.rank ? `#${fighter.rank}` : "-"}</TableCell>
-                <TableCell className="pr-5 py-4 text-right sm:pr-6">
+                <TableCell className="py-4 pr-5 text-right sm:pr-6">
                   <Link
                     href={`/admin/fighters/edit?fighterId=${fighter.id}`}
                     className="text-sm font-medium text-primary underline-offset-4 hover:underline"

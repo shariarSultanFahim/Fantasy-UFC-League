@@ -9,7 +9,7 @@ export const fighterFormSchema = z.object({
   wins: z.number().min(0, "Wins cannot be negative."),
   losses: z.number().min(0, "Losses cannot be negative."),
   draws: z.number().min(0, "Draws cannot be negative."),
-  points: z.number().min(0, "Points cannot be negative."),
+  avgPoints: z.number().min(0, "Points cannot be negative."),
   bio: z.string().trim().min(20, "Bio must be at least 20 characters."),
   avatarDataUrl: z.string().min(1, "Upload and crop a square image.")
 });

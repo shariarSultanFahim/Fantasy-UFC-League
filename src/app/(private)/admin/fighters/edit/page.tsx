@@ -1,5 +1,4 @@
 import { AdminPageHeader } from "../../components/AdminPageHeader";
-
 import { FighterForm } from "../components/FighterForm";
 import { getFighterById } from "../components/fighters-data";
 
@@ -25,7 +24,7 @@ export default async function EditFighterPage({ searchParams }: EditFighterPageP
           wins: fighter.wins,
           losses: fighter.losses,
           draws: fighter.draws,
-          points: fighter.points,
+          avgPoints: fighter.points,
           bio: `${fighter.name} (${fighter.nickname}) is one of the most recognized names in ${fighter.division}.`,
           avatarDataUrl: fighter.avatarUrl
         }}

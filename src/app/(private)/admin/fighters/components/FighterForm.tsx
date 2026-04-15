@@ -1,13 +1,33 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Save } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-
-import { Button, Card, CardContent, CardHeader, CardTitle, Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input, Textarea } from "@/components/ui";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
 import { toast } from "sonner";
+
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
+  Textarea
+} from "@/components/ui";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+
 import { fighterFormSchema, type FighterFormValues } from "../schema/fighter-form-schema";
 import { FighterImageCropUploader } from "./FighterImageCropUploader";
 import { DIVISION_OPTIONS, NATIONALITY_OPTIONS } from "./fighters-data";
@@ -26,7 +46,7 @@ const defaultValues: FighterFormValues = {
   wins: 0,
   losses: 0,
   draws: 0,
-  points: 0,
+  avgPoints: 0,
   bio: "",
   avatarDataUrl: ""
 };
@@ -42,9 +62,14 @@ export function FighterForm({ mode, initialValues }: FighterFormProps) {
 
   const onSubmit = (values: FighterFormValues) => {
     console.log("Form submitted with values:", values);
-    toast.success(mode === "create" ? "Fighter profile created successfully!" : "Fighter profile updated successfully!",{
-        position: "top-center",
-    });
+    toast.success(
+      mode === "create"
+        ? "Fighter profile created successfully!"
+        : "Fighter profile updated successfully!",
+      {
+        position: "top-center"
+      }
+    );
   };
 
   return (
@@ -99,11 +124,13 @@ export function FighterForm({ mode, initialValues }: FighterFormProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {DIVISION_OPTIONS.filter((item) => item !== "All Divisions").map((option) => (
-                          <SelectItem key={option} value={option}>
-                            {option}
-                          </SelectItem>
-                        ))}
+                        {DIVISION_OPTIONS.filter((item) => item !== "All Divisions").map(
+                          (option) => (
+                            <SelectItem key={option} value={option}>
+                              {option}
+                            </SelectItem>
+                          )
+                        )}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -217,10 +244,10 @@ export function FighterForm({ mode, initialValues }: FighterFormProps) {
 
             <FormField
               control={form.control}
-              name="points"
+              name="avgPoints"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Points</FormLabel>
+                  <FormLabel>Average Last Fight Point</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -241,10 +268,16 @@ export function FighterForm({ mode, initialValues }: FighterFormProps) {
                 <FormItem>
                   <div className="flex items-center justify-between gap-2">
                     <FormLabel>Bio</FormLabel>
-                    <span className="text-xs text-muted-foreground">{field.value.length} characters</span>
+                    <span className="text-xs text-muted-foreground">
+                      {field.value.length} characters
+                    </span>
                   </div>
                   <FormControl>
-                    <Textarea rows={4} placeholder="Write a short profile for this fighter..." {...field} />
+                    <Textarea
+                      rows={4}
+                      placeholder="Write a short profile for this fighter..."
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -49,7 +49,20 @@ export const FIGHTERS_DATA: Fighter[] = [
     points: 2847,
     rank: 1,
     avatarUrl:
-      "https://images.unsplash.com/photo-1521119989659-a83eee488004?q=80&w=400&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1521119989659-a83eee488004?q=80&w=400&auto=format&fit=crop",
+    age: 32,
+    height: "5'10\"",
+    reach: '70"',
+    koWins: 12,
+    submissionWins: 8,
+    decisionWins: 5,
+    titleDefenses: 3,
+    upcomingOpponent: "Dustin Poirier",
+    upcomingEvent: "UFC 304",
+    scheduledDate: "July 27, 2024",
+    lastFiveFightsAvgPoints: 92.4,
+    pointsChange: 8,
+    formerChampionDivisions: []
   },
   {
     id: "f-002",
@@ -63,7 +76,20 @@ export const FIGHTERS_DATA: Fighter[] = [
     points: 2756,
     rank: 2,
     avatarUrl:
-      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop",
+    age: 36,
+    height: "6'2\"",
+    reach: '84.5"',
+    koWins: 10,
+    submissionWins: 6,
+    decisionWins: 11,
+    titleDefenses: 11,
+    upcomingOpponent: "Stipe Miocic",
+    upcomingEvent: "UFC 309",
+    scheduledDate: "November 16, 2024",
+    lastFiveFightsAvgPoints: 88.2,
+    pointsChange: 5,
+    formerChampionDivisions: ["Men's Light Heavyweight", "Men's Heavyweight"]
   },
   {
     id: "f-003",
@@ -77,7 +103,20 @@ export const FIGHTERS_DATA: Fighter[] = [
     points: 2456,
     rank: 3,
     avatarUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
+    age: 31,
+    height: "6'0\"",
+    reach: '76"',
+    koWins: 8,
+    submissionWins: 1,
+    decisionWins: 2,
+    titleDefenses: 1,
+    upcomingOpponent: "Dricus du Plessis",
+    upcomingEvent: "UFC 305",
+    scheduledDate: "August 3, 2024",
+    lastFiveFightsAvgPoints: 85.6,
+    pointsChange: 12,
+    formerChampionDivisions: ["Men's Middleweight"]
   },
   {
     id: "f-004",
@@ -91,7 +130,20 @@ export const FIGHTERS_DATA: Fighter[] = [
     points: 2156,
     rank: 4,
     avatarUrl:
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=400&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=400&auto=format&fit=crop",
+    age: 32,
+    height: "6'0\"",
+    reach: '73"',
+    koWins: 6,
+    submissionWins: 2,
+    decisionWins: 16,
+    titleDefenses: 10,
+    upcomingOpponent: "Sean Strickland",
+    upcomingEvent: "UFC 293",
+    scheduledDate: "September 9, 2023",
+    lastFiveFightsAvgPoints: 79.3,
+    pointsChange: -2,
+    formerChampionDivisions: ["Men's Middleweight"]
   },
   {
     id: "f-005",
@@ -105,7 +157,20 @@ export const FIGHTERS_DATA: Fighter[] = [
     points: 2045,
     rank: 5,
     avatarUrl:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop",
+    age: 33,
+    height: "5'11\"",
+    reach: '72"',
+    koWins: 7,
+    submissionWins: 3,
+    decisionWins: 11,
+    titleDefenses: 1,
+    upcomingOpponent: "Colby Covington",
+    upcomingEvent: "UFC 295",
+    scheduledDate: "November 11, 2023",
+    lastFiveFightsAvgPoints: 82.1,
+    pointsChange: 6,
+    formerChampionDivisions: ["Men's Welterweight"]
   },
   {
     id: "f-006",
@@ -119,7 +184,20 @@ export const FIGHTERS_DATA: Fighter[] = [
     points: 1944,
     rank: 6,
     avatarUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
+    age: 35,
+    height: "5'8\"",
+    reach: '67"',
+    koWins: 10,
+    submissionWins: 1,
+    decisionWins: 14,
+    titleDefenses: 11,
+    upcomingOpponent: "TBA",
+    upcomingEvent: "TBA",
+    scheduledDate: "TBA",
+    lastFiveFightsAvgPoints: 86.5,
+    pointsChange: -1,
+    formerChampionDivisions: ["Men's Featherweight"]
   },
   {
     id: "f-007",
@@ -133,7 +211,20 @@ export const FIGHTERS_DATA: Fighter[] = [
     points: 1845,
     rank: 7,
     avatarUrl:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop",
+    age: 27,
+    height: "5'9\"",
+    reach: '69"',
+    koWins: 7,
+    submissionWins: 2,
+    decisionWins: 6,
+    titleDefenses: 0,
+    upcomingOpponent: "Alexander Volkanovski",
+    upcomingEvent: "UFC 298",
+    scheduledDate: "February 17, 2024",
+    lastFiveFightsAvgPoints: 84.2,
+    pointsChange: 15,
+    formerChampionDivisions: []
   },
   {
     id: "f-008",
@@ -147,7 +238,20 @@ export const FIGHTERS_DATA: Fighter[] = [
     points: 1701,
     rank: 8,
     avatarUrl:
-      "https://images.unsplash.com/photo-1521119989659-a83eee488004?q=80&w=400&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1521119989659-a83eee488004?q=80&w=400&auto=format&fit=crop",
+    age: 35,
+    height: "5'9\"",
+    reach: '74"',
+    koWins: 19,
+    submissionWins: 1,
+    decisionWins: 2,
+    titleDefenses: 0,
+    upcomingOpponent: "Michael Chandler",
+    upcomingEvent: "UFC 303",
+    scheduledDate: "June 29, 2024",
+    lastFiveFightsAvgPoints: 87.4,
+    pointsChange: 12,
+    formerChampionDivisions: ["Men's Featherweight", "Men's Lightweight"]
   },
   {
     id: "f-009",
@@ -161,7 +265,20 @@ export const FIGHTERS_DATA: Fighter[] = [
     points: 1645,
     rank: null,
     avatarUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
+    age: 34,
+    height: "6'1\"",
+    reach: '77"',
+    koWins: 8,
+    submissionWins: 3,
+    decisionWins: 16,
+    titleDefenses: 0,
+    upcomingOpponent: "TBA",
+    upcomingEvent: "TBA",
+    scheduledDate: "TBA",
+    lastFiveFightsAvgPoints: 75.8,
+    pointsChange: 3,
+    formerChampionDivisions: []
   },
   {
     id: "f-010",
@@ -175,7 +292,20 @@ export const FIGHTERS_DATA: Fighter[] = [
     points: 1523,
     rank: null,
     avatarUrl:
-      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop",
+    age: 36,
+    height: "5'10\"",
+    reach: '70"',
+    koWins: 8,
+    submissionWins: 10,
+    decisionWins: 11,
+    titleDefenses: 3,
+    upcomingOpponent: "Retired",
+    upcomingEvent: "N/A",
+    scheduledDate: "N/A",
+    lastFiveFightsAvgPoints: 91.2,
+    pointsChange: 0,
+    formerChampionDivisions: ["Men's Lightweight"]
   }
 ];
 

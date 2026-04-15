@@ -6,9 +6,10 @@ import { Search } from "lucide-react";
 
 import { Card } from "@/components/ui";
 import { Input } from "@/components/ui/input";
-import type { FighterFilters } from "@/types";
+import type { Fighter, FighterFilters } from "@/types";
 
 import { DEFAULT_FILTERS, FIGHTERS_DATA } from "./data";
+import { FighterDetailsModal } from "./FighterDetailsModal";
 import { RankingsFiltersSheet } from "./RankingsFiltersSheet";
 import { RankingsPagination } from "./RankingsPagination";
 import { RankingsTable } from "./RankingsTable";
@@ -20,6 +21,8 @@ export function RankingsDatabase() {
   const [query, setQuery] = React.useState("");
   const [page, setPage] = React.useState(1);
   const [filters, setFilters] = React.useState<FighterFilters>(DEFAULT_FILTERS);
+  const [selectedFighter, setSelectedFighter] = React.useState<Fighter | null>(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   const filteredFighters = FIGHTERS_DATA.filter((fighter) => {
     const matchesQuery =
@@ -51,6 +54,16 @@ export function RankingsDatabase() {
   const endIndex = startIndex + STATIC_LIMIT;
   const paginatedFighters = filteredFighters.slice(startIndex, endIndex);
 
+  const handleFighterClick = (fighter: Fighter) => {
+    setSelectedFighter(fighter);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedFighter(null);
+  };
+
   return (
     <section className="space-y-4">
       <Card className="gap-0 p-3 sm:p-4">
@@ -81,13 +94,19 @@ export function RankingsDatabase() {
         </div>
       </Card>
 
-      <RankingsTable fighters={paginatedFighters} />
+      <RankingsTable fighters={paginatedFighters} onFighterClick={handleFighterClick} />
 
       <RankingsPagination
         page={page}
         limit={STATIC_LIMIT}
         totalPage={Math.ceil(filteredFighters.length / STATIC_LIMIT)}
         onPageChange={setPage}
+      />
+
+      <FighterDetailsModal
+        fighter={selectedFighter}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
       />
     </section>
   );

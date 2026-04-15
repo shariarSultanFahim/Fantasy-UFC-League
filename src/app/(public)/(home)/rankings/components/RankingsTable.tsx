@@ -12,13 +12,14 @@ import type { Fighter } from "@/types";
 
 interface RankingsTableProps {
   fighters: Fighter[];
+  onFighterClick?: (fighter: Fighter) => void;
 }
 
 // function recordLabel(fighter: Fighter) {
 //   return `${fighter.wins}-${fighter.losses}-${fighter.draws}`;
 // }
 
-export function RankingsTable({ fighters }: RankingsTableProps) {
+export function RankingsTable({ fighters, onFighterClick }: RankingsTableProps) {
   return (
     <Card className="gap-0 py-0">
       <CardHeader className="px-5 py-5 sm:px-6">
@@ -39,7 +40,11 @@ export function RankingsTable({ fighters }: RankingsTableProps) {
           </TableHeader>
           <TableBody>
             {fighters.map((fighter) => (
-              <TableRow key={fighter.id}>
+              <TableRow
+                key={fighter.id}
+                onClick={() => onFighterClick?.(fighter)}
+                className="cursor-pointer hover:bg-slate-50 transition-colors"
+              >
                 <TableCell className="px-5 py-4 sm:px-6">
                   <span className="font-bold text-[#EC5B13]">
                     {fighter.rank ? `#${fighter.rank}` : "-"}

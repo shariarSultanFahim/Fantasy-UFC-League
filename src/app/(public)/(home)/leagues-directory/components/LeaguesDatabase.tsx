@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 import { Button, Card } from "@/components/ui";
 
@@ -62,8 +63,11 @@ export function LeaguesDatabase() {
           <Button className="h-9 bg-indigo-900 px-5 text-xs font-semibold hover:bg-indigo-800">
             Join a League
           </Button>
-          <Button className="h-9 bg-indigo-900 px-5 text-xs font-semibold hover:bg-indigo-800">
-            Create League
+          <Button
+            asChild
+            className="h-9 bg-indigo-900 px-5 text-xs font-semibold hover:bg-indigo-800"
+          >
+            <Link href="/leagues-directory/create">Create League</Link>
           </Button>
         </Card>
       </Card>

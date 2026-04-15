@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 import type { LeagueLobbyEntry } from "@/types/league";
 
 import {
+  getCurrentLoggedInUserName,
+  getJoinedLeagueMembers,
   joinLeagueLobby,
   setLeagueDraftStatus,
   upsertLeagueLobbyMeta
@@ -16,6 +18,7 @@ import {
 import { Button, Card } from "@/components/ui";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { LEAGUE_LOBBY_DATA } from "./data";
 import { LeaguesPagination } from "./LeaguesPagination";
@@ -25,22 +28,74 @@ const LEAGUES_PER_PAGE = 8;
 const INSTANT_LEAGUE_ID = "instant-league";
 const INSTANT_LEAGUE_NAME = "Instant League";
 const INSTANT_LEAGUE_MEMBER_LIMIT = 10;
+type LeaguesDirectoryView = "all" | "my";
 
 export function LeaguesDatabase() {
   const router = useRouter();
   const [page, setPage] = React.useState(1);
+  const [activeView, setActiveView] = React.useState<LeaguesDirectoryView>("all");
+  const [myLeagueIds, setMyLeagueIds] = React.useState<string[]>([]);
   const [selectedLeague, setSelectedLeague] = React.useState<LeagueLobbyEntry | null>(null);
   const [enteredPasscode, setEnteredPasscode] = React.useState("");
   const [passcodeError, setPasscodeError] = React.useState("");
 
   const allLeagues = LEAGUE_LOBBY_DATA;
-  const draftingRooms = allLeagues.length;
-  const fullRooms = allLeagues.filter((league) => league.members >= league.memberLimit).length;
+  const refreshMyLeagues = React.useCallback(() => {
+    const currentUserName = getCurrentLoggedInUserName().toLowerCase();
 
-  const totalPage = Math.ceil(allLeagues.length / LEAGUES_PER_PAGE);
+    const joinedLeagueIds = allLeagues
+      .filter((league) =>
+        getJoinedLeagueMembers(league.id).some(
+          (member) => member.name.toLowerCase() === currentUserName
+        )
+      )
+      .map((league) => league.id);
+
+    setMyLeagueIds(joinedLeagueIds);
+  }, [allLeagues]);
+
+  React.useEffect(() => {
+    refreshMyLeagues();
+  }, [refreshMyLeagues]);
+
+  React.useEffect(() => {
+    setPage(1);
+  }, [activeView]);
+
+  const leaguesToDisplay = React.useMemo(() => {
+    if (activeView === "all") {
+      return allLeagues;
+    }
+
+    const joinedLeagues = new Set(myLeagueIds);
+    return allLeagues
+      .filter((league) => joinedLeagues.has(league.id))
+      .map((league) => ({
+        ...league,
+        actionLabel: "View",
+        actionStyle: "dark",
+        hasPasscode: false,
+        passcode: undefined
+      }));
+  }, [activeView, allLeagues, myLeagueIds]);
+
+  React.useEffect(() => {
+    const totalPageCount = Math.max(1, Math.ceil(leaguesToDisplay.length / LEAGUES_PER_PAGE));
+
+    if (page > totalPageCount) {
+      setPage(1);
+    }
+  }, [leaguesToDisplay.length, page]);
+
+  const draftingRooms = leaguesToDisplay.length;
+  const fullRooms = leaguesToDisplay.filter(
+    (league) => league.members >= league.memberLimit
+  ).length;
+
+  const totalPage = Math.ceil(leaguesToDisplay.length / LEAGUES_PER_PAGE);
   const startIndex = (page - 1) * LEAGUES_PER_PAGE;
   const endIndex = startIndex + LEAGUES_PER_PAGE;
-  const paginatedLeagues = allLeagues.slice(startIndex, endIndex);
+  const paginatedLeagues = leaguesToDisplay.slice(startIndex, endIndex);
 
   const navigateToDraftLobby = (league: LeagueLobbyEntry) => {
     upsertLeagueLobbyMeta({
@@ -54,6 +109,11 @@ export function LeaguesDatabase() {
   };
 
   const handleLeagueAction = (league: LeagueLobbyEntry) => {
+    if (activeView === "my") {
+      router.push(`/leagues-directory/my-team?leagueId=${league.id}`);
+      return;
+    }
+
     if (league.actionStyle === "muted") {
       return;
     }
@@ -92,6 +152,7 @@ export function LeaguesDatabase() {
     });
     setLeagueDraftStatus(INSTANT_LEAGUE_ID, "waiting");
     joinLeagueLobby(INSTANT_LEAGUE_ID);
+    refreshMyLeagues();
     router.push(`/leagues-directory/draft-lobby?leagueId=${INSTANT_LEAGUE_ID}`);
   };
 
@@ -147,15 +208,41 @@ export function LeaguesDatabase() {
         </Card>
       </Card>
 
-      <LeaguesTable leagues={paginatedLeagues} onActionClick={handleLeagueAction} />
+      <Tabs
+        value={activeView}
+        onValueChange={(value) => setActiveView(value as LeaguesDirectoryView)}
+        className="w-full"
+      >
+        <TabsList className="h-11 rounded-md bg-slate-100 p-1">
+          <TabsTrigger value="all" className="px-5 text-sm font-semibold">
+            Leagues Directory
+          </TabsTrigger>
+          <TabsTrigger value="my" className="px-5 text-sm font-semibold">
+            My Leagues
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
 
-      <LeaguesPagination
-        page={page}
-        limit={LEAGUES_PER_PAGE}
-        totalCount={allLeagues.length}
-        totalPage={totalPage}
-        onPageChange={setPage}
-      />
+      {activeView === "my" && leaguesToDisplay.length === 0 ? (
+        <Card className="border border-dashed border-slate-200 bg-white p-10 text-center">
+          <h3 className="text-base font-semibold text-slate-900">No joined leagues yet</h3>
+          <p className="mt-2 text-sm text-slate-600">
+            Join a league from the directory tab and it will appear here.
+          </p>
+        </Card>
+      ) : (
+        <LeaguesTable leagues={paginatedLeagues} onActionClick={handleLeagueAction} />
+      )}
+
+      {leaguesToDisplay.length > 0 ? (
+        <LeaguesPagination
+          page={page}
+          limit={LEAGUES_PER_PAGE}
+          totalCount={leaguesToDisplay.length}
+          totalPage={totalPage}
+          onPageChange={setPage}
+        />
+      ) : null}
 
       <Dialog
         open={Boolean(selectedLeague)}

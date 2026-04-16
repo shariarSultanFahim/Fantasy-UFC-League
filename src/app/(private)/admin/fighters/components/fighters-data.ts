@@ -10,6 +10,21 @@ export const DIVISION_OPTIONS = [
   "Bantamweight"
 ];
 
+export const FORM_DIVISION_OPTIONS = [
+  "All Divisions",
+  "Men's Heavyweight",
+  "Men's Light Heavyweight",
+  "Men's Middleweight",
+  "Men's Welterweight",
+  "Men's Lightweight",
+  "Men's Featherweight",
+  "Men's Bantamweight",
+  "Men's Flyweight",
+  "Women's Bantamweight",
+  "Women's Flyweight",
+  "Women's Strawweight"
+];
+
 export const RANK_RANGE_OPTIONS = ["All Ranks", "Top 5", "Top 10", "Top 15", "Unranked"];
 
 export const NATIONALITY_OPTIONS = [
@@ -21,6 +36,29 @@ export const NATIONALITY_OPTIONS = [
   "Cameroon",
   "Brazil"
 ];
+
+interface CountryApiResponseItem {
+  name: string;
+  independent?: boolean;
+}
+
+export async function getCountryNames() {
+  try {
+    const response = await fetch("https://restcountries.com/v2/all?fields=name");
+
+    if (!response.ok) {
+      return [];
+    }
+
+    const countries = (await response.json()) as CountryApiResponseItem[];
+
+    return countries
+      .map((country) => country.name)
+      .sort((first, second) => first.localeCompare(second));
+  } catch {
+    return [];
+  }
+}
 
 export const DEFAULT_FILTERS: FighterFilters = {
   division: "All Divisions",

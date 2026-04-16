@@ -20,21 +20,16 @@ import {
   Input,
   Textarea
 } from "@/components/ui";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
 
 import { fighterFormSchema, type FighterFormValues } from "../schema/fighter-form-schema";
+import { FighterCombobox } from "./FighterCombobox";
 import { FighterImageCropUploader } from "./FighterImageCropUploader";
-import { DIVISION_OPTIONS, NATIONALITY_OPTIONS } from "./fighters-data";
+import { FORM_DIVISION_OPTIONS } from "./fighters-data";
 
 interface FighterFormProps {
   mode: "create" | "edit";
   initialValues?: Partial<FighterFormValues>;
+  nationalityOptions: string[];
 }
 
 const defaultValues: FighterFormValues = {
@@ -51,7 +46,7 @@ const defaultValues: FighterFormValues = {
   avatarDataUrl: ""
 };
 
-export function FighterForm({ mode, initialValues }: FighterFormProps) {
+export function FighterForm({ mode, initialValues, nationalityOptions }: FighterFormProps) {
   const form = useForm<FighterFormValues>({
     resolver: zodResolver(fighterFormSchema),
     defaultValues: {
@@ -60,8 +55,7 @@ export function FighterForm({ mode, initialValues }: FighterFormProps) {
     }
   });
 
-  const onSubmit = (values: FighterFormValues) => {
-    console.log("Form submitted with values:", values);
+  const onSubmit = () => {
     toast.success(
       mode === "create"
         ? "Fighter profile created successfully!"
@@ -117,22 +111,15 @@ export function FighterForm({ mode, initialValues }: FighterFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Division</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select division" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {DIVISION_OPTIONS.filter((item) => item !== "All Divisions").map(
-                          (option) => (
-                            <SelectItem key={option} value={option}>
-                              {option}
-                            </SelectItem>
-                          )
-                        )}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <FighterCombobox
+                        value={field.value}
+                        options={FORM_DIVISION_OPTIONS.filter((item) => item !== "All Divisions")}
+                        placeholder="Select division"
+                        searchPlaceholder="Search divisions..."
+                        onValueChange={field.onChange}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -144,22 +131,15 @@ export function FighterForm({ mode, initialValues }: FighterFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Nationality</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select nationality" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {NATIONALITY_OPTIONS.filter((item) => item !== "All Nationalities").map(
-                          (option) => (
-                            <SelectItem key={option} value={option}>
-                              {option}
-                            </SelectItem>
-                          )
-                        )}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <FighterCombobox
+                        value={field.value}
+                        options={nationalityOptions}
+                        placeholder="Select nationality"
+                        searchPlaceholder="Search nationalities..."
+                        onValueChange={field.onChange}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

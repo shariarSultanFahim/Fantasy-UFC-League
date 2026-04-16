@@ -13,7 +13,7 @@ export function BuildTeamCard() {
         </p>
         <div className="mt-5 space-y-2">
           <Button asChild className="w-full bg-cyan-200 font-bold text-slate-900 hover:bg-cyan-100">
-            <Link href="/sign-up">Create a League</Link>
+            <Link href="/leagues-directory/create">Create a League</Link>
           </Button>
           <Button asChild className="w-full bg-blue-500 font-bold text-white hover:bg-blue-400">
             <Link href="/leagues-directory">Join a Public League</Link>

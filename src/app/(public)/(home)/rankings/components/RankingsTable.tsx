@@ -33,7 +33,7 @@ export function RankingsTable({ fighters, onFighterClick }: RankingsTableProps) 
               <TableHead className="w-[25%] px-5 py-3 sm:px-6">Player</TableHead>
               <TableHead className="w-[15%]">Division</TableHead>
               <TableHead className="w-[15%]">Nationality</TableHead>
-              <TableHead className="w-[10%] text-right">LS</TableHead>
+              <TableHead className="w-[10%] text-right">L5</TableHead>
               <TableHead className="w-[10%] text-right">W</TableHead>
               <TableHead className="w-[10%] pr-5 text-right sm:pr-6">L</TableHead>
             </TableRow>

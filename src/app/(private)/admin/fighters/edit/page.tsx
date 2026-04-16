@@ -1,6 +1,6 @@
 import { AdminPageHeader } from "../../components/AdminPageHeader";
 import { FighterForm } from "../components/FighterForm";
-import { getFighterById } from "../components/fighters-data";
+import { getCountryNames, getFighterById } from "../components/fighters-data";
 
 interface EditFighterPageProps {
   searchParams: Promise<{ fighterId?: string }>;
@@ -9,12 +9,14 @@ interface EditFighterPageProps {
 export default async function EditFighterPage({ searchParams }: EditFighterPageProps) {
   const { fighterId } = await searchParams;
   const fighter = getFighterById(fighterId);
+  const nationalityOptions = await getCountryNames();
 
   return (
     <>
       <AdminPageHeader title="Edit Fighter" subtitle="Update fighter profile details and image" />
       <FighterForm
         mode="edit"
+        nationalityOptions={nationalityOptions}
         initialValues={{
           name: fighter.name,
           nickname: fighter.nickname,

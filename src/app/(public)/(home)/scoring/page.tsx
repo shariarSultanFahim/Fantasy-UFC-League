@@ -1,3 +1,5 @@
+import { SCORING_CRITERIA } from "@/constants/scoring-criteria";
+
 import {
   Table,
   TableBody,
@@ -7,14 +9,13 @@ import {
   TableRow
 } from "@/components/ui/table";
 
-const offensiveActions = [
-  "Win (Any method)",
-  'Win by "Finish"',
-  'Win against "Ranked Opponent"',
-  'Win in a "5 Round Bout"',
-  'Win a "Championship Fight"',
-  'Win "Champion vs Champion"'
-];
+import { DEFAULT_SCORING_SETTINGS } from "../../../../constants/scoring-settings";
+
+const scoringRows = SCORING_CRITERIA.map((criterion) => ({
+  action: criterion.title,
+  description: criterion.description,
+  points: DEFAULT_SCORING_SETTINGS[criterion.key]
+}));
 
 export default function ScoringPage() {
   return (
@@ -23,7 +24,7 @@ export default function ScoringPage() {
         <section className="rounded-sm bg-[#0A192F] px-6 py-14 text-center text-white sm:px-10 lg:py-16">
           <h1 className="text-5xl font-black tracking-tight sm:text-6xl">Scoring &amp; Rules</h1>
           <p className="mx-auto mt-5 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
-            Understand the point system to build your winning team.
+            Understand the point system used by the admin scoring settings.
           </p>
         </section>
 
@@ -32,8 +33,11 @@ export default function ScoringPage() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-100/80 hover:bg-slate-100/80">
-                  <TableHead className="w-[80%] px-6 py-3 text-xs font-semibold tracking-[0.14em] text-slate-500 uppercase">
-                    Action
+                  <TableHead className="w-[64%] px-6 py-3 text-xs font-semibold tracking-[0.14em] text-slate-500 uppercase">
+                    Scoring Rule
+                  </TableHead>
+                  <TableHead className="px-6 py-3 text-xs font-semibold tracking-[0.14em] text-slate-500 uppercase">
+                    Notes
                   </TableHead>
                   <TableHead className="px-6 py-3 text-xs font-semibold tracking-[0.14em] text-slate-500 uppercase">
                     Points
@@ -42,22 +46,34 @@ export default function ScoringPage() {
               </TableHeader>
 
               <TableBody>
-                {offensiveActions.map((action, index) => (
+                {scoringRows.map((row, index) => (
                   <TableRow
-                    key={action}
-                    className={index === offensiveActions.length - 1 ? "bg-slate-50/70" : ""}
+                    key={row.action}
+                    className={index === scoringRows.length - 1 ? "bg-slate-50/70" : ""}
                   >
                     <TableCell className="px-6 py-4 text-base font-medium text-slate-800">
-                      {action}
+                      {row.action}
+                    </TableCell>
+                    <TableCell className="px-6 py-4 text-sm leading-6 text-slate-600">
+                      {row.description}
                     </TableCell>
                     <TableCell className="px-6 py-4 text-base font-bold text-emerald-500">
-                      +1
+                      +{row.points}
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </div>
+        </section>
+
+        <section className="mt-10 rounded-xl border border-slate-200 bg-white px-6 py-5 text-sm text-slate-600 shadow-sm">
+          The current highlighted rare bonus is{" "}
+          <span className="font-semibold text-slate-900">Champion vs Champion Win</span>, set to{" "}
+          <span className="font-semibold text-emerald-600">
+            +{DEFAULT_SCORING_SETTINGS.championVsChampionWin}
+          </span>
+          .
         </section>
       </div>
     </main>

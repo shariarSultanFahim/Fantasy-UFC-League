@@ -35,6 +35,11 @@ export const SCORING_CRITERIA: ScoringCriterion[] = [
     description: "Bonus points for title fight victories."
   },
   {
+    key: "championVsChampionWin",
+    title: "Champion vs Champion Win",
+    description: "Bonus points for rare champion vs champion victories."
+  },
+  {
     key: "nonChampionshipFight",
     title: "Non Championship Fight",
     description: "Points for a standard non-title win."

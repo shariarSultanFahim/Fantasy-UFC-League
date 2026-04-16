@@ -15,6 +15,7 @@ export const scoringSettingsSchema = z.object({
   finishBonus: scoreField,
   decisionWin: scoreField,
   winningChampionshipBout: scoreField,
+  championVsChampionWin: scoreField,
   nonChampionshipFight: scoreField,
   winningAgainstRankedOpponent: scoreField,
   fightingUnrankedOpponent: scoreField,

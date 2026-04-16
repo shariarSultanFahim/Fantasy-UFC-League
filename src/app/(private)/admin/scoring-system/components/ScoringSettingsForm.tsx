@@ -14,7 +14,7 @@ import {
   Undo2
 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
 import { SCORING_CRITERIA } from "@/constants/scoring-criteria";
 
@@ -32,20 +32,10 @@ import {
 } from "@/components/ui";
 import type { ScoringSettings } from "@/types";
 
+import { DEFAULT_SCORING_SETTINGS } from "../../../../../constants/scoring-settings";
 import { scoringSettingsSchema } from "../schema/scoring-settings-schema";
 
-const defaultValues: ScoringSettings = {
-  winPoints: 1,
-  koTkoBonus: 0,
-  finishBonus: 1,
-  decisionWin: 0,
-  winningChampionshipBout: 1,
-  nonChampionshipFight: 0,
-  winningAgainstRankedOpponent: 1,
-  fightingUnrankedOpponent: 0,
-  winningFiveRoundFight: 1,
-  threeRoundFight: 0
-};
+const defaultValues: ScoringSettings = DEFAULT_SCORING_SETTINGS;
 
 const scoringFields: Array<{
   name: keyof ScoringSettings;
@@ -63,6 +53,7 @@ const scoringFields: Array<{
       finishBonus: BadgePlus,
       decisionWin: Scale,
       winningChampionshipBout: Crown,
+      championVsChampionWin: Crown,
       nonChampionshipFight: Swords,
       winningAgainstRankedOpponent: Gauge,
       fightingUnrankedOpponent: Handshake,
@@ -85,9 +76,14 @@ export function ScoringSettingsForm() {
     defaultValues
   });
 
-  const values = form.watch();
+  const values = useWatch({
+    control: form.control,
+    defaultValue: defaultValues
+  }) as ScoringSettings;
 
   const koVictoryPreview = values.winPoints + values.koTkoBonus + values.finishBonus;
+  const championVictoryPreview =
+    values.winPoints + values.winningChampionshipBout + values.championVsChampionWin;
   const roundOneSubPreview =
     values.winPoints +
     values.finishBonus +
@@ -172,6 +168,30 @@ export function ScoringSettingsForm() {
                 <div className="flex items-center justify-between border-t border-indigo-700 pt-2 text-lg font-semibold">
                   <span>Total Fantasy Points</span>
                   <span>{koVictoryPreview}</span>
+                </div>
+              </div>
+
+              <div className="space-y-3 rounded-xl bg-indigo-800/70 p-4">
+                <p className="text-xs font-semibold tracking-[0.16em] text-indigo-200 uppercase">
+                  Scenario: Champion vs Champion
+                </p>
+                <div className="space-y-1.5 text-sm">
+                  <p className="flex items-center justify-between">
+                    <span>Base Win</span>
+                    <span>+{values.winPoints}</span>
+                  </p>
+                  <p className="flex items-center justify-between">
+                    <span>Title Fight Bonus</span>
+                    <span>+{values.winningChampionshipBout}</span>
+                  </p>
+                  <p className="flex items-center justify-between">
+                    <span>Champion vs Champion Bonus</span>
+                    <span>+{values.championVsChampionWin}</span>
+                  </p>
+                </div>
+                <div className="flex items-center justify-between border-t border-indigo-700 pt-2 text-lg font-semibold">
+                  <span>Total Fantasy Points</span>
+                  <span>{championVictoryPreview}</span>
                 </div>
               </div>
 

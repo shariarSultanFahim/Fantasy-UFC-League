@@ -4,6 +4,7 @@ export interface ScoringSettings {
   finishBonus: number;
   decisionWin: number;
   winningChampionshipBout: number;
+  championVsChampionWin: number;
   nonChampionshipFight: number;
   winningAgainstRankedOpponent: number;
   fightingUnrankedOpponent: number;

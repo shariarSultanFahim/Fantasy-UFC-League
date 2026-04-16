@@ -43,32 +43,27 @@ const scoringFields: Array<{
   description: string;
   icon: React.ComponentType<{ className?: string }>;
 }> = [
-  ...SCORING_CRITERIA.map((criterion) => {
-    const iconByCriteria: Record<
-      keyof ScoringSettings,
-      React.ComponentType<{ className?: string }>
-    > = {
-      winPoints: Shield,
-      koTkoBonus: Sparkles,
-      finishBonus: BadgePlus,
-      decisionWin: Scale,
-      winningChampionshipBout: Crown,
-      championVsChampionWin: Crown,
-      nonChampionshipFight: Swords,
-      winningAgainstRankedOpponent: Gauge,
-      fightingUnrankedOpponent: Handshake,
-      winningFiveRoundFight: BookCheck,
-      threeRoundFight: Scale
-    };
+    ...SCORING_CRITERIA.map((criterion) => {
+      const iconByCriteria: Record<
+        keyof ScoringSettings,
+        React.ComponentType<{ className?: string }>
+      > = {
+        winPoints: Shield,
+        finishBonus: BadgePlus,
+        winningChampionshipBout: Crown,
+        championVsChampionWin: Crown,
+        winningAgainstRankedOpponent: Gauge,
+        winningFiveRoundFight: BookCheck
+      };
 
-    return {
-      name: criterion.key,
-      title: criterion.title,
-      description: criterion.description,
-      icon: iconByCriteria[criterion.key]
-    };
-  })
-];
+      return {
+        name: criterion.key,
+        title: criterion.title,
+        description: criterion.description,
+        icon: iconByCriteria[criterion.key]
+      };
+    })
+  ];
 
 export function ScoringSettingsForm() {
   const form = useForm<ScoringSettings>({
@@ -81,14 +76,11 @@ export function ScoringSettingsForm() {
     defaultValue: defaultValues
   }) as ScoringSettings;
 
-  const koVictoryPreview = values.winPoints + values.koTkoBonus + values.finishBonus;
+  const stoppageVictoryPreview = values.winPoints + values.finishBonus;
   const championVictoryPreview =
     values.winPoints + values.winningChampionshipBout + values.championVsChampionWin;
-  const roundOneSubPreview =
-    values.winPoints +
-    values.finishBonus +
-    values.winningChampionshipBout +
-    values.winningFiveRoundFight;
+  const rankedFiveRoundWinPreview =
+    values.winPoints + values.winningAgainstRankedOpponent + values.winningFiveRoundFight;
 
   const handleSubmit = (settings: ScoringSettings) => {
     console.log("scoringSettingsPayload:", settings);
@@ -149,16 +141,12 @@ export function ScoringSettingsForm() {
 
               <div className="space-y-3 rounded-xl bg-indigo-800/70 p-4">
                 <p className="text-xs font-semibold tracking-[0.16em] text-indigo-200 uppercase">
-                  Scenario: KO Victory
+                  Scenario: Stoppage Victory
                 </p>
                 <div className="space-y-1.5 text-sm">
                   <p className="flex items-center justify-between">
-                    <span>Win Points</span>
+                    <span>Win Point</span>
                     <span>+{values.winPoints}</span>
-                  </p>
-                  <p className="flex items-center justify-between">
-                    <span>KO/TKO Bonus</span>
-                    <span>+{values.koTkoBonus}</span>
                   </p>
                   <p className="flex items-center justify-between">
                     <span>Finish Bonus</span>
@@ -167,7 +155,7 @@ export function ScoringSettingsForm() {
                 </div>
                 <div className="flex items-center justify-between border-t border-indigo-700 pt-2 text-lg font-semibold">
                   <span>Total Fantasy Points</span>
-                  <span>{koVictoryPreview}</span>
+                  <span>{stoppageVictoryPreview}</span>
                 </div>
               </div>
 
@@ -197,7 +185,7 @@ export function ScoringSettingsForm() {
 
               <div className="space-y-3 rounded-xl bg-indigo-800/70 p-4">
                 <p className="text-xs font-semibold tracking-[0.16em] text-indigo-200 uppercase">
-                  Scenario: Round 1 Sub + Bonus
+                  Scenario: Ranked 5-Round Win
                 </p>
                 <div className="space-y-1.5 text-sm">
                   <p className="flex items-center justify-between">
@@ -205,12 +193,8 @@ export function ScoringSettingsForm() {
                     <span>+{values.winPoints}</span>
                   </p>
                   <p className="flex items-center justify-between">
-                    <span>Finish Bonus</span>
-                    <span>+{values.finishBonus}</span>
-                  </p>
-                  <p className="flex items-center justify-between">
-                    <span>Championship Bonus</span>
-                    <span>+{values.winningChampionshipBout}</span>
+                    <span>Ranked Opponent Bonus</span>
+                    <span>+{values.winningAgainstRankedOpponent}</span>
                   </p>
                   <p className="flex items-center justify-between">
                     <span>5 Round Win Bonus</span>
@@ -219,7 +203,7 @@ export function ScoringSettingsForm() {
                 </div>
                 <div className="flex items-center justify-between border-t border-indigo-700 pt-2 text-lg font-semibold">
                   <span>Total Fantasy Points</span>
-                  <span>{roundOneSubPreview}</span>
+                  <span>{rankedFiveRoundWinPreview}</span>
                 </div>
               </div>
 

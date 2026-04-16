@@ -11,57 +11,32 @@ export interface ScoringCriterion {
 export const SCORING_CRITERIA: ScoringCriterion[] = [
   {
     key: "winPoints",
-    title: "Win Points",
-    description: "Base points awarded for a victory."
-  },
-  {
-    key: "koTkoBonus",
-    title: "KO/TKO Bonus",
-    description: "Additional points for knockout wins."
+    title: "Win Point",
+    description: "Base point awarded for a victory."
   },
   {
     key: "finishBonus",
     title: "Finish Bonus",
-    description: "Extra points for submission or stoppage."
-  },
-  {
-    key: "decisionWin",
-    title: "Decision Win",
-    description: "Points for wins by judges decision."
+    description: "Extra point for KO/TKO/SUB/DQ or stoppage wins."
   },
   {
     key: "winningChampionshipBout",
     title: "Winning Championship Bout",
-    description: "Bonus points for title fight victories."
+    description: "Extra point for title fight (interim or undisputed championship) victories."
   },
   {
     key: "championVsChampionWin",
     title: "Champion vs Champion Win",
-    description: "Bonus points for rare champion vs champion victories."
-  },
-  {
-    key: "nonChampionshipFight",
-    title: "Non Championship Fight",
-    description: "Points for a standard non-title win."
+    description: "Rare extra point for champion moves up or down a division and wins title fight (interim or undisputed) in that division."
   },
   {
     key: "winningAgainstRankedOpponent",
     title: "Winning Against Ranked Opponent",
-    description: "Bonus for defeating a ranked fighter."
-  },
-  {
-    key: "fightingUnrankedOpponent",
-    title: "Fighting Unranked Opponent",
-    description: "Adjuster for matches versus unranked fighters."
+    description: "Extra point for defeating a ranked fighter."
   },
   {
     key: "winningFiveRoundFight",
     title: "Winning a 5 Round Fight",
-    description: "Extra points for five-round victories."
-  },
-  {
-    key: "threeRoundFight",
-    title: "3 Round Fight",
-    description: "Adjuster for standard three-round fights."
+    description: "Extra point for five-round bout victories."
   }
 ];

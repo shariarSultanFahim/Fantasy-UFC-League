@@ -31,11 +31,11 @@ import { profileFormSchema } from "../schema/profile-form-schema";
 const initialProfile: AdminProfileState = {
   name: "Alex Rivera",
   role: "Super Admin",
-  email: "alex.rivera@fantasyufc.com",
+  email: "alex.rivera@fantasymma.com",
   phone: "+1 (555) 0123",
   location: "Las Vegas, NV",
   timezone: getDeviceTimezone(),
-  bio: "Lead operations manager for the Fantasy UFC League. Specializing in fighter data integrity and high-stakes league moderation since 2021.",
+  bio: "Lead operations manager for the Fantasy MMA League. Specializing in fighter data integrity and high-stakes league moderation since 2021.",
   imageUrl: "/demo.jpeg"
 };
 

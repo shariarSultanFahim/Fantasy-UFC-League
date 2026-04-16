@@ -40,7 +40,7 @@ export default function ScoringPage() {
                     Notes
                   </TableHead>
                   <TableHead className="px-6 py-3 text-xs font-semibold tracking-[0.14em] text-slate-500 uppercase">
-                    Points
+                    Point
                   </TableHead>
                 </TableRow>
               </TableHeader>

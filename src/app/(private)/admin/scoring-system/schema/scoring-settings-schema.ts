@@ -11,14 +11,9 @@ const scoreField = z
 
 export const scoringSettingsSchema = z.object({
   winPoints: scoreField,
-  koTkoBonus: scoreField,
   finishBonus: scoreField,
-  decisionWin: scoreField,
   winningChampionshipBout: scoreField,
   championVsChampionWin: scoreField,
-  nonChampionshipFight: scoreField,
   winningAgainstRankedOpponent: scoreField,
-  fightingUnrankedOpponent: scoreField,
-  winningFiveRoundFight: scoreField,
-  threeRoundFight: scoreField
+  winningFiveRoundFight: scoreField
 });

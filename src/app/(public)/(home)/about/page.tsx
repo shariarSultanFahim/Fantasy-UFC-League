@@ -21,7 +21,7 @@ export default function AboutPage() {
               About Our <span className="text-[#EC5B13]">Fantasy</span> Fight League
             </h1>
             <p className="mt-5 max-w-xl text-sm leading-6 text-slate-600 sm:text-base">
-              Build your ultimate team with real UFC fighters and compete against fans worldwide
+              Build your ultimate team with real MMA fighters and compete against fans worldwide
               based on live octagon results. The cage is yours.
             </p>
           </div>

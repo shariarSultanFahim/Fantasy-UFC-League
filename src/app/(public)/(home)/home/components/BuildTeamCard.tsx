@@ -7,7 +7,7 @@ export function BuildTeamCard() {
   return (
     <Card className="rounded-xl border-0 bg-linear-to-b from-indigo-700 to-indigo-800 text-white shadow-lg">
       <CardContent className="p-5">
-        <h3 className="text-2xl leading-tight font-black">BUILD YOUR ULTIMATE UFC FANTASY TEAM</h3>
+        <h3 className="text-2xl leading-tight font-black">BUILD YOUR ULTIMATE MMA FANTASY TEAM</h3>
         <p className="mt-3 text-sm text-indigo-100">
           The season is starting! Build your team and dominate the league.
         </p>

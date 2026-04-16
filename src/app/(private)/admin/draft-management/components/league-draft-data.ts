@@ -42,7 +42,7 @@ const SHARED_TEAMS: DraftTeamDetails[] = [
     id: "team-alpha",
     name: "Alpha Elite",
     ownerName: "Mason Kent",
-    ownerEmail: "mason.kent@fantasyufc.com",
+    ownerEmail: "mason.kent@fantasymma.com",
     ownerAvatarUrl: "/demo.jpeg",
     fighters: [
       { id: "fighter-001", name: "Jon Jones", division: "Heavyweight", ranking: 1 },
@@ -54,7 +54,7 @@ const SHARED_TEAMS: DraftTeamDetails[] = [
     id: "team-strike",
     name: "Strike Force",
     ownerName: "Leah Park",
-    ownerEmail: "leah.park@fantasyufc.com",
+    ownerEmail: "leah.park@fantasymma.com",
     ownerAvatarUrl: "/demo.jpeg",
     fighters: [
       { id: "fighter-004", name: "Islam Makhachev", division: "Lightweight", ranking: 1 },
@@ -66,7 +66,7 @@ const SHARED_TEAMS: DraftTeamDetails[] = [
     id: "team-grapple",
     name: "Grapple Kings",
     ownerName: "Noah Francis",
-    ownerEmail: "noah.francis@fantasyufc.com",
+    ownerEmail: "noah.francis@fantasymma.com",
     ownerAvatarUrl: "/demo.jpeg",
     fighters: [
       { id: "fighter-007", name: "Charles Oliveira", division: "Lightweight", ranking: 2 },
@@ -78,7 +78,7 @@ const SHARED_TEAMS: DraftTeamDetails[] = [
     id: "team-octagon",
     name: "Octagon Titans",
     ownerName: "Rico Mendoza",
-    ownerEmail: "rico.mendoza@fantasyufc.com",
+    ownerEmail: "rico.mendoza@fantasymma.com",
     ownerAvatarUrl: "/demo.jpeg",
     fighters: [
       { id: "fighter-010", name: "Tom Aspinall", division: "Heavyweight", ranking: 2 },
@@ -92,7 +92,7 @@ const SHARED_PARTICIPANTS: DraftParticipant[] = [
   {
     id: "participant-01",
     name: "Mason Kent",
-    email: "mason.kent@fantasyufc.com",
+    email: "mason.kent@fantasymma.com",
     teamName: "Alpha Elite",
     joinedAt: "2026-04-10 11:12 AM",
     avatarUrl: "/demo.jpeg"
@@ -100,7 +100,7 @@ const SHARED_PARTICIPANTS: DraftParticipant[] = [
   {
     id: "participant-02",
     name: "Leah Park",
-    email: "leah.park@fantasyufc.com",
+    email: "leah.park@fantasymma.com",
     teamName: "Strike Force",
     joinedAt: "2026-04-10 11:20 AM",
     avatarUrl: "/demo.jpeg"
@@ -108,7 +108,7 @@ const SHARED_PARTICIPANTS: DraftParticipant[] = [
   {
     id: "participant-03",
     name: "Noah Francis",
-    email: "noah.francis@fantasyufc.com",
+    email: "noah.francis@fantasymma.com",
     teamName: "Grapple Kings",
     joinedAt: "2026-04-10 11:31 AM",
     avatarUrl: "/demo.jpeg"
@@ -116,7 +116,7 @@ const SHARED_PARTICIPANTS: DraftParticipant[] = [
   {
     id: "participant-04",
     name: "Rico Mendoza",
-    email: "rico.mendoza@fantasyufc.com",
+    email: "rico.mendoza@fantasymma.com",
     teamName: "Octagon Titans",
     joinedAt: "2026-04-10 11:44 AM",
     avatarUrl: "/demo.jpeg"

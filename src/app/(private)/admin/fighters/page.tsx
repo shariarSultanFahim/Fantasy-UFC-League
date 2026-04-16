@@ -7,7 +7,7 @@ export default function FightersPage() {
     <>
       <AdminPageHeader
         title="Fighter Database"
-        subtitle="Manage and scout active UFC roster for your leagues"
+        subtitle="Manage and scout active MMA roster for your leagues"
         actionLabel="Add New Fighter"
         actionHref="/admin/fighters/new"
       />

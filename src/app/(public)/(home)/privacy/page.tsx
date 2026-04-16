@@ -68,7 +68,7 @@ export default function PrivacyPage() {
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
             At Fantasy Fight League, your privacy is part of the game plan. This policy explains how
-            we collect, use, and protect the information you share while using our UFC fantasy
+            we collect, use, and protect the information you share while using our MMA fantasy
             sports platform.
           </p>
         </div>

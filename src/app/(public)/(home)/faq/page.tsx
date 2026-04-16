@@ -18,7 +18,7 @@ const faqs = [
   {
     question: "How are fantasy points calculated?",
     answer: [
-      "Fantasy points are awarded based on real UFC performance metrics.",
+      "Fantasy points are awarded based on real MMA performance metrics.",
       "Significant strikes: +0.2 pts",
       "Takedowns: +2 pts",
       "Submissions: +3 pts",

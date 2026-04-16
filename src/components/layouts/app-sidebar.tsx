@@ -36,7 +36,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const data = {
   info: {
-    title: "Fantasy UFC League",
+    title: "Fantasy MMA League",
     subtitle: "Admin Portal"
   },
   navMain: [
@@ -176,7 +176,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </Avatar>
                 <div>
                   <h2 className="font-semibold">Gabriel</h2>
-                  <h3 className="text-sm text-gray-500">gabriel@fantasyufc.com</h3>
+                  <h3 className="text-sm text-gray-500">gabriel@fantasymma.com</h3>
                 </div>
               </div>
             </div>

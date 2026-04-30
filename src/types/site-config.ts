@@ -7,6 +7,7 @@ export interface SocialLinks {
 export interface SiteConfig {
   name: string;
   description: string;
+  favicon: string;
   url: string;
   author: string;
   locale: string;

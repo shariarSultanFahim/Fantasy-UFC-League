@@ -7,6 +7,7 @@ export const siteConfig: SiteConfig = {
   url: env.NEXT_PUBLIC_SITE_URL,
   author: "Fantasy MMA League Team",
   locale: "en",
+  favicon: "/logo.png",
   themeColor: "#576045",
   keywords: ["fantasy sports", "MMA", "MMA", "sports league", "team management"],
   social: {

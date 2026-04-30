@@ -9,6 +9,11 @@ export const seoConfig: Metadata = {
     template: `%s | ${siteConfig.name}`
   },
   description: siteConfig.description,
+  icons: {
+    icon: siteConfig.favicon,
+    shortcut: siteConfig.favicon,
+    apple: siteConfig.favicon,
+  },
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",

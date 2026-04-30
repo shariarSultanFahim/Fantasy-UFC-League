@@ -1,3 +1,4 @@
+import { AuthSplitLayout } from "../components/AuthSplitLayout";
 import { ResetPasswordForm } from "./components/ResetPasswordForm";
 import { Suspense } from "react";
 
@@ -8,10 +9,21 @@ export const metadata = {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
+    <AuthSplitLayout
+      heroBackgroundClassName="bg-[url('/forget-password.png')]"
+      heroTitle={
+        <>
+          Reset Your
+          <br />
+          <span className="text-amber-400">Password</span>
+        </>
+      }
+      heroDescription="Enter your new password to regain access to your fantasy fight account."
+      chips={["Secure Recovery", "Fast Account Access", "Always Protected"]}
+    >
       <Suspense fallback={<div>Loading...</div>}>
         <ResetPasswordForm />
       </Suspense>
-    </div>
+    </AuthSplitLayout>
   );
 }

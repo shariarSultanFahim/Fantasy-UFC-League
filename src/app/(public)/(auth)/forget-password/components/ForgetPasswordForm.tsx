@@ -22,6 +22,8 @@ import {
   forgetPasswordFormSchema,
   type ForgetPasswordFormValues
 } from "../schema/forget-password-form-schema";
+import { toast } from "sonner";
+import { useForgotPassword } from "@/lib/actions/auth";
 
 const defaultValues: ForgetPasswordFormValues = {
   email: ""
@@ -29,14 +31,26 @@ const defaultValues: ForgetPasswordFormValues = {
 
 export function ForgetPasswordForm() {
   const [submittedEmail, setSubmittedEmail] = useState("");
+  const { mutateAsync: forgotPassword, isPending } = useForgotPassword();
 
   const form = useForm<ForgetPasswordFormValues>({
     resolver: zodResolver(forgetPasswordFormSchema),
     defaultValues
   });
 
-  const onSubmit = (values: ForgetPasswordFormValues) => {
-    setSubmittedEmail(values.email);
+  const onSubmit = async (values: ForgetPasswordFormValues) => {
+    if (!values.email) {
+      toast.error("Please enter your email address");
+      return;
+    }
+
+    try {
+      await forgotPassword({ email: values.email });
+      setSubmittedEmail(values.email);
+      toast.success("Password reset link sent to your email!");
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error?.message || "Something went wrong");
+    }
     form.reset(defaultValues);
   };
 

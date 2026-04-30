@@ -1,5 +1,7 @@
 import Image from "next/image";
 
+import { getImageUrl } from "@/lib/utils";
+
 import type { LeagueFighter } from "@/types/league-simulation";
 
 import { Button } from "@/components/ui";
@@ -19,7 +21,7 @@ export function AddFighterModal({ fighter, onClose, onConfirm }: AddFighterModal
           <div className="px-8 py-7 text-center sm:px-10 sm:py-8">
             <div className="mx-auto mb-4 flex justify-center">
               <Image
-                src={fighter.avatarUrl}
+                src={getImageUrl(fighter.avatarUrl)}
                 alt={fighter.name}
                 width={124}
                 height={124}

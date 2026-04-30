@@ -4,7 +4,7 @@ import * as React from "react";
 
 import { CircleEllipsis, Pause, PlayIcon, RotateCcw, SkipForward, TimerReset } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn, getImageUrl } from "@/lib/utils";
 
 import { Button, Card, CardContent } from "@/components/ui";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -189,7 +189,7 @@ export function DraftOverviewSection() {
               <CardContent className="px-4 py-3">
                 <div className="flex items-center gap-3">
                   <Avatar>
-                    <AvatarImage src={pickCard.imageUrl} alt={pickCard.fighterName} />
+                    <AvatarImage src={getImageUrl(pickCard.imageUrl)} alt={pickCard.fighterName} />
                     <AvatarFallback>{pickCard.fighterName.slice(0, 2)}</AvatarFallback>
                   </Avatar>
                   <div className="space-y-0.5">

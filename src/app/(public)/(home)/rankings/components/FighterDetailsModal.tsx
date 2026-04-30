@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { getImageUrl } from "@/lib/utils";
 
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -33,7 +34,7 @@ export function FighterDetailsModal({ fighter, isOpen, onClose }: FighterDetails
           <div className="mb-8 flex gap-4 sm:gap-6">
             <div className="relative h-32 w-32 shrink-0 overflow-hidden rounded-lg bg-slate-200">
               <Image
-                src={fighter.avatarUrl}
+                src={getImageUrl(fighter.avatarUrl)}
                 alt={fighter.name}
                 fill
                 className="object-cover"

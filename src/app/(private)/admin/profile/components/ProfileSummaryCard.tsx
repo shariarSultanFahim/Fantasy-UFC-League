@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 import {
   Camera,
@@ -24,56 +24,62 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import type { AdminProfileFormValues, AdminProfileState } from "@/types";
+import type { AdminProfileFormValues } from "../schema/profile-form-schema";
+import { getImageUrl } from "@/lib/utils";
 
+import { useProfile } from "@/hooks";
 import { profileFormSchema } from "../schema/profile-form-schema";
-
-const initialProfile: AdminProfileState = {
-  name: "Alex Rivera",
-  role: "Super Admin",
-  email: "alex.rivera@fantasymma.com",
-  phone: "+1 (555) 0123",
-  location: "Las Vegas, NV",
-  timezone: getDeviceTimezone(),
-  bio: "Lead operations manager for the Fantasy MMA League. Specializing in fighter data integrity and high-stakes league moderation since 2021.",
-  imageUrl: "/demo.jpeg"
-};
+import { Loader2 } from "lucide-react";
 
 function getDeviceTimezone() {
   return Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown timezone";
 }
 
-function getFormValues(profile: AdminProfileState): AdminProfileFormValues {
-  return {
-    name: profile.name,
-    role: profile.role,
-    email: profile.email,
-    phone: profile.phone,
-    location: profile.location,
-    bio: profile.bio
-  };
-}
-
 export function ProfileSummaryCard() {
+  const { profile, isLoading, updateProfile, isUpdating } = useProfile();
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState<AdminProfileState>(() => ({
-    ...initialProfile,
-    timezone: getDeviceTimezone()
-  }));
-  const [imagePreview, setImagePreview] = useState(initialProfile.imageUrl);
+  const [imagePreview, setImagePreview] = useState<string | undefined>(undefined);
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [fileInputKey, setFileInputKey] = useState(0);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const form = useForm<AdminProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
-    defaultValues: getFormValues(profile)
+    defaultValues: {
+      name: "",
+      role: "",
+      email: "",
+      phone: "",
+      location: "",
+      bio: ""
+    }
   });
 
+  // Update form when profile data is loaded, but only if not editing
+  useEffect(() => {
+    if (profile && !isEditing) {
+      form.reset({
+        name: profile.name,
+        role: profile.role,
+        email: profile.email,
+        phone: profile.phone || "",
+        location: profile.location || "",
+        bio: profile.bio || ""
+      });
+    }
+  }, [profile, form, isEditing]);
+
   const startEditing = () => {
-    form.reset(getFormValues(profile));
+    form.reset({
+      name: profile?.name || "",
+      role: profile?.role || "",
+      email: profile?.email || "",
+      phone: profile?.phone || "",
+      location: profile?.location || "",
+      bio: profile?.bio || ""
+    });
     setSelectedImageFile(null);
-    setImagePreview(profile.imageUrl);
+    setImagePreview(profile?.avatarUrl);
     setIsEditing(true);
   };
 
@@ -82,7 +88,7 @@ export function ProfileSummaryCard() {
     setSelectedImageFile(file);
 
     if (!file) {
-      setImagePreview(profile.imageUrl);
+      setImagePreview(profile?.avatarUrl);
       return;
     }
 
@@ -96,27 +102,47 @@ export function ProfileSummaryCard() {
   };
 
   const cancelEditing = () => {
-    form.reset(getFormValues(profile));
-    setSelectedImageFile(null);
-    setImagePreview(profile.imageUrl);
-    setFileInputKey((currentKey) => currentKey + 1);
-
-    setIsEditing(false);
-  };
-
-  const handleSubmit = (values: AdminProfileFormValues) => {
-    console.log("data:", values, "image:", selectedImageFile);
-
-    setProfile({
-      ...values,
-      timezone: getDeviceTimezone(),
-      imageUrl: imagePreview
+    form.reset({
+      name: profile?.name || "",
+      role: profile?.role || "",
+      email: profile?.email || "",
+      phone: profile?.phone || "",
+      location: profile?.location || "",
+      bio: profile?.bio || ""
     });
     setSelectedImageFile(null);
+    setImagePreview(profile?.avatarUrl);
     setFileInputKey((currentKey) => currentKey + 1);
 
     setIsEditing(false);
   };
+
+  const handleSubmit = async (values: AdminProfileFormValues) => {
+    const formData = new FormData();
+    const { role, email, ...updateData } = values; // Role and email are usually not updatable via this endpoint
+    
+    formData.append("data", JSON.stringify(updateData));
+    if (selectedImageFile) {
+      formData.append("image", selectedImageFile);
+    }
+
+    try {
+      await updateProfile(formData);
+      setIsEditing(false);
+      setSelectedImageFile(null);
+      setFileInputKey((currentKey) => currentKey + 1);
+    } catch (error) {
+      console.error("Profile update error:", error);
+    }
+  };
+
+  if (isLoading || !profile) {
+    return (
+      <Card className="flex h-[400px] items-center justify-center border-border/60 bg-card/95 shadow-sm">
+        <Loader2 className="size-8 animate-spin text-blue-600" />
+      </Card>
+    );
+  }
 
   const profileDetails = [
     {
@@ -127,17 +153,17 @@ export function ProfileSummaryCard() {
     {
       icon: Phone,
       label: "Phone",
-      value: profile.phone
+      value: profile.phone || "Not provided"
     },
     {
       icon: MapPin,
       label: "Location",
-      value: profile.location
+      value: profile.location || "Not provided"
     },
     {
       icon: Clock3,
       label: "Timezone",
-      value: profile.timezone
+      value: getDeviceTimezone()
     }
   ];
 
@@ -161,9 +187,9 @@ export function ProfileSummaryCard() {
             <div className="rounded-2xl border border-border/60 bg-slate-50/80 p-4">
               <div className="relative mx-auto w-fit">
                 <Avatar className="size-24 border-4 border-background shadow-lg shadow-slate-950/10">
-                  <AvatarImage src={imagePreview} alt="Portrait of Alex Rivera" />
+                  <AvatarImage src={getImageUrl(imagePreview)} alt={`Portrait of ${profile.name}`} />
                   <AvatarFallback className="text-base font-semibold text-slate-700">
-                    AR
+                    {profile.name.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
 
@@ -194,50 +220,48 @@ export function ProfileSummaryCard() {
               <div className="space-y-2.5">
                 <Label htmlFor="name">Name</Label>
                 <Input id="name" {...form.register("name")} />
-                {form.formState.errors.name ? (
-                  <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>
-                ) : null}
+                {form.formState.errors.name?.message && (
+                  <p className="text-sm text-destructive">{String(form.formState.errors.name.message)}</p>
+                )}
               </div>
 
               <div className="space-y-2.5">
                 <Label htmlFor="role">Role</Label>
                 <Input id="role" {...form.register("role")} disabled />
-                {form.formState.errors.role ? (
-                  <p className="text-sm text-destructive">{form.formState.errors.role.message}</p>
-                ) : null}
+                {form.formState.errors.role?.message && (
+                  <p className="text-sm text-destructive">{String(form.formState.errors.role.message)}</p>
+                )}
               </div>
 
               <div className="space-y-2.5">
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" type="email" {...form.register("email")} disabled />
-                {form.formState.errors.email ? (
-                  <p className="text-sm text-destructive">{form.formState.errors.email.message}</p>
-                ) : null}
+                {form.formState.errors.email?.message && (
+                  <p className="text-sm text-destructive">{String(form.formState.errors.email.message)}</p>
+                )}
               </div>
 
               <div className="space-y-2.5">
                 <Label htmlFor="phone">Phone</Label>
                 <Input id="phone" {...form.register("phone")} />
-                {form.formState.errors.phone ? (
-                  <p className="text-sm text-destructive">{form.formState.errors.phone.message}</p>
-                ) : null}
+                {form.formState.errors.phone?.message && (
+                  <p className="text-sm text-destructive">{String(form.formState.errors.phone.message)}</p>
+                )}
               </div>
 
               <div className="space-y-2.5">
                 <Label htmlFor="location">Location</Label>
                 <Input id="location" {...form.register("location")} />
-                {form.formState.errors.location ? (
-                  <p className="text-sm text-destructive">
-                    {form.formState.errors.location.message}
-                  </p>
-                ) : null}
+                {form.formState.errors.location?.message && (
+                  <p className="text-sm text-destructive">{String(form.formState.errors.location.message)}</p>
+                )}
               </div>
               <div className="space-y-2.5">
                 <Label htmlFor="timezone">Timezone</Label>
                 <Input
                   id="timezone"
                   disabled
-                  value={profile.timezone}
+                  value={getDeviceTimezone()}
                   className="bg-background/60 text-slate-700"
                 />
               </div>
@@ -246,9 +270,9 @@ export function ProfileSummaryCard() {
             <div className="space-y-2.5">
               <Label htmlFor="bio">Bio</Label>
               <Textarea id="bio" rows={4} {...form.register("bio")} />
-              {form.formState.errors.bio ? (
-                <p className="text-sm text-destructive">{form.formState.errors.bio.message}</p>
-              ) : null}
+              {form.formState.errors.bio?.message && (
+                <p className="text-sm text-destructive">{String(form.formState.errors.bio.message)}</p>
+              )}
             </div>
 
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
@@ -261,8 +285,12 @@ export function ProfileSummaryCard() {
                 <X className="size-4" />
                 Cancel
               </Button>
-              <Button className="w-full shadow-lg shadow-slate-950/10 sm:w-auto" type="submit">
-                <Save className="size-4" />
+              <Button 
+                className="w-full shadow-lg shadow-slate-950/10 sm:w-auto" 
+                type="submit"
+                disabled={isUpdating}
+              >
+                {isUpdating ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Save className="size-4" />}
                 Save Changes
               </Button>
             </div>
@@ -273,8 +301,10 @@ export function ProfileSummaryCard() {
           <CardContent className="relative space-y-6 px-5 pt-7 pb-6 sm:px-6 sm:pb-7">
             <div className="flex flex-col items-center text-center">
               <Avatar className="size-28 border-4 border-background shadow-xl shadow-slate-950/20">
-                <AvatarImage src={profile.imageUrl} alt="Portrait of Alex Rivera" />
-                <AvatarFallback className="text-lg font-semibold text-slate-700">AR</AvatarFallback>
+                <AvatarImage src={getImageUrl(profile.avatarUrl)} alt={`Portrait of ${profile.name}`} />
+                <AvatarFallback className="text-lg font-semibold text-slate-700">
+                  {profile.name.substring(0, 2).toUpperCase()}
+                </AvatarFallback>
               </Avatar>
 
               <div className="mt-4 space-y-1">

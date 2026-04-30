@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { Eye } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn, getImageUrl } from "@/lib/utils";
 
 import {
   Card,
@@ -140,7 +140,7 @@ export function LeaguesTable({ leagues }: LeaguesTableProps) {
                   <TableCell className="py-4">
                     <div className="flex items-center gap-2.5">
                       <Avatar className="size-7">
-                        <AvatarImage src={league.managerAvatarUrl} alt={league.managerName} />
+                        <AvatarImage src={getImageUrl(league.managerAvatarUrl)} alt={league.managerName} />
                         <AvatarFallback>{league.managerName.slice(0, 2)}</AvatarFallback>
                       </Avatar>
                       <span className="font-medium text-slate-700">{league.managerName}</span>

@@ -12,6 +12,7 @@ import { getLeagueQueue, setLeagueQueue } from "@/helpers/league-lobby";
 
 import { LEAGUE_FIGHTERS } from "@/data/league-fighters";
 
+import { getImageUrl } from "@/lib/utils";
 import { Button, Card, Input } from "@/components/ui";
 import {
   Select,
@@ -232,7 +233,7 @@ export function PreDraftRankingsBoard() {
 
                 <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
                   <Image
-                    src={fighter.avatarUrl}
+                    src={getImageUrl(fighter.avatarUrl)}
                     alt={fighter.name}
                     width={42}
                     height={42}
@@ -311,7 +312,7 @@ export function PreDraftRankingsBoard() {
                   </span>
                   <div className="flex items-center gap-2">
                     <Image
-                      src={fighter.avatarUrl}
+                      src={getImageUrl(fighter.avatarUrl)}
                       alt={fighter.name}
                       width={36}
                       height={36}

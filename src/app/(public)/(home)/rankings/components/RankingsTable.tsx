@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getImageUrl } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -53,7 +54,7 @@ export function RankingsTable({ fighters, onFighterClick }: RankingsTableProps) 
                 <TableCell className="px-5 py-4 sm:px-6">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={fighter.avatarUrl} alt={fighter.name} />
+                      <AvatarImage src={getImageUrl(fighter.avatarUrl)} alt={fighter.name} />
                       <AvatarFallback>{fighter.name.slice(0, 2).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div>

@@ -19,6 +19,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
+import { toast } from "sonner";
+import { useLogin } from "@/lib/actions/auth";
+import { buildAuthSessionFromLoginResponse } from "@/lib/auth/session";
+import { cookie } from "@/lib/cookie-client";
+import { AUTH_SESSION_COOKIE, ROLE_HOME_PATHS } from "@/constants/auth";
+
 import { loginFormSchema, type LoginFormValues } from "../schema/login-form-schema";
 
 const defaultValues: LoginFormValues = {
@@ -35,8 +41,23 @@ export function LoginForm() {
     defaultValues
   });
 
-  const onSubmit = (_values: LoginFormValues) => {
-    router.push("/admin/dashboard");
+  const { mutateAsync: login, isPending } = useLogin();
+
+  const onSubmit = async (values: LoginFormValues) => {
+    try {
+      const response = await login({
+        email: values.email,
+        password: values.password
+      });
+      
+      const session = buildAuthSessionFromLoginResponse(response.data);
+      cookie.set(AUTH_SESSION_COOKIE, JSON.stringify(session));
+      
+      router.push(ROLE_HOME_PATHS[session.role]);
+      toast.success(response.message || "Welcome back!");
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error?.message || "Login failed");
+    }
   };
 
   return (
@@ -108,8 +129,8 @@ export function LoginForm() {
               </Link>
             </div>
 
-            <Button type="submit" className="h-11 w-full text-sm font-semibold">
-              Login
+            <Button type="submit" disabled={isPending} className="h-11 w-full text-sm font-semibold">
+              {isPending ? "Logging in..." : "Login"}
             </Button>
 
             <p className="text-center text-sm text-slate-600">

@@ -2,16 +2,41 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn, getImageUrl } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
+import { useMe } from "@/lib/actions/auth";
+import { cookie } from "@/lib/cookie-client";
+import { AUTH_SESSION_COOKIE } from "@/constants/auth";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { toast } from "sonner";
+import { LogOut, User as UserIcon, LayoutDashboard } from "lucide-react";
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const hasSession = !!cookie.get(AUTH_SESSION_COOKIE);
+  const { data: userData, isLoading: isUserLoading } = useMe();
+  const user = userData?.data;
+
+  const handleLogout = () => {
+    cookie.remove(AUTH_SESSION_COOKIE);
+    toast.success("Logged out successfully");
+    window.location.href = "/"; // Full reload to clear all states
+  };
 
   const navLinks = [
     { href: "/home", label: "Home" },
@@ -87,19 +112,70 @@ export default function Header() {
               })}
             </div>
 
-            {/* Auth Buttons */}
+            {/* Auth Buttons or User Menu */}
             <div className="flex items-center space-x-2">
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                className="border-[#144045] bg-[#144045] hover:bg-[#144045]/80 hover:text-white"
-              >
-                <Link href="/sign-up">Sign Up</Link>
-              </Button>
-              <Button asChild size="sm" className="bg-[#2F3969] hover:bg-[#2F3969]/80">
-                <Link href="/login">Log In</Link>
-              </Button>
+              {hasSession && user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                      <Avatar className="h-10 w-10 border border-slate-700">
+                        <AvatarImage src={getImageUrl(user.avatarUrl)} alt={user.name} />
+                        <AvatarFallback className="bg-slate-800 text-slate-200">
+                          {user.name?.slice(0, 2).toUpperCase() || "US"}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{user.name}</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      {user.role === "ADMIN" ? (
+                        <Link href="/admin/dashboard" className="cursor-pointer">
+                          <LayoutDashboard className="mr-2 h-4 w-4" />
+                          <span>Dashboard</span>
+                        </Link>
+                      ) : (
+                        <Link href="/profile" className="cursor-pointer">
+                          <UserIcon className="mr-2 h-4 w-4" />
+                          <span>Profile</span>
+                        </Link>
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      className="cursor-pointer text-red-500 focus:text-red-500" 
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : isUserLoading && hasSession ? (
+                <div className="h-10 w-10 animate-pulse rounded-full bg-slate-800" />
+              ) : (
+                <>
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="border-[#144045] bg-[#144045] hover:bg-[#144045]/80 hover:text-white"
+                  >
+                    <Link href="/sign-up">Sign Up</Link>
+                  </Button>
+                  <Button asChild size="sm" className="bg-[#2F3969] hover:bg-[#2F3969]/80">
+                    <Link href="/login">Log In</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>

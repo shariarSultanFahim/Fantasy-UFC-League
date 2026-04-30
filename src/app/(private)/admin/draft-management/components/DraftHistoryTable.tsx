@@ -17,6 +17,7 @@ import {
 } from "@/components/ui";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { DraftPickHistory } from "@/types";
+import { getImageUrl } from "@/lib/utils";
 
 interface DraftHistoryTableProps {
   picks: DraftPickHistory[];
@@ -78,7 +79,7 @@ export function DraftHistoryTable({ picks }: DraftHistoryTableProps) {
                 <TableCell className="py-4">
                   <div className="flex items-center gap-2.5">
                     <Avatar>
-                      <AvatarImage src={pick.fighterImageUrl} alt={pick.fighterName} />
+                      <AvatarImage src={getImageUrl(pick.fighterImageUrl)} alt={pick.fighterName} />
                       <AvatarFallback>{pick.fighterName.slice(0, 2)}</AvatarFallback>
                     </Avatar>
                     <div className="space-y-0.5">

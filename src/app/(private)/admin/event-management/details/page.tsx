@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { getImageUrl } from "@/lib/utils";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -33,7 +34,7 @@ export default async function EventDetailsPage({ searchParams }: EventDetailsPag
       <Card className="overflow-hidden py-0">
         <div className="relative aspect-video w-full bg-muted">
           <Image
-            src={event.posterUrl}
+            src={getImageUrl(event.posterUrl)}
             alt={`${event.name} poster`}
             fill
             className="object-cover"
@@ -88,7 +89,7 @@ export default async function EventDetailsPage({ searchParams }: EventDetailsPag
                 <div className="grid gap-4 md:grid-cols-[1fr_auto_1fr] md:items-center">
                   <div className="flex items-center gap-3 rounded-lg border p-3">
                     <Avatar className="size-12">
-                      <AvatarImage src={bout.fighter1.avatarUrl} alt={bout.fighter1.name} />
+                      <AvatarImage src={getImageUrl(bout.fighter1.avatarUrl)} alt={bout.fighter1.name} />
                       <AvatarFallback>{fighterInitials(bout.fighter1.name)}</AvatarFallback>
                     </Avatar>
                     <div>
@@ -101,7 +102,7 @@ export default async function EventDetailsPage({ searchParams }: EventDetailsPag
 
                   <div className="flex items-center gap-3 rounded-lg border p-3">
                     <Avatar className="size-12">
-                      <AvatarImage src={bout.fighter2.avatarUrl} alt={bout.fighter2.name} />
+                      <AvatarImage src={getImageUrl(bout.fighter2.avatarUrl)} alt={bout.fighter2.name} />
                       <AvatarFallback>{fighterInitials(bout.fighter2.name)}</AvatarFallback>
                     </Avatar>
                     <div>

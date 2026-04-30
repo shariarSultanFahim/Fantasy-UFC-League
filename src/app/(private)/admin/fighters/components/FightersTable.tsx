@@ -13,6 +13,7 @@ import {
   TableRow
 } from "@/components/ui";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getImageUrl } from "@/lib/utils";
 import type { Fighter } from "@/types";
 
 interface FightersTableProps {
@@ -47,7 +48,7 @@ export function FightersTable({ fighters }: FightersTableProps) {
                 <TableCell className="px-5 py-4 sm:px-6">
                   <div className="flex items-center gap-3">
                     <Avatar>
-                      <AvatarImage src={fighter.avatarUrl} alt={fighter.name} />
+                      <AvatarImage src={getImageUrl(fighter.avatarUrl)} alt={fighter.name} />
                       <AvatarFallback>{fighter.name.slice(0, 2).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <span className="font-medium">{fighter.name}</span>

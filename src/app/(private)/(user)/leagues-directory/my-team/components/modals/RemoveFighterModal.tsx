@@ -1,5 +1,7 @@
 import Image from "next/image";
 
+import { getImageUrl } from "@/lib/utils";
+
 import type { TeamFighterRow } from "@/types/my-team";
 
 import { Button } from "@/components/ui";
@@ -19,7 +21,7 @@ export function RemoveFighterModal({ fighter, onClose, onConfirm }: RemoveFighte
           <div className="px-8 py-7 text-center sm:px-10 sm:py-8">
             <div className="mx-auto mb-4 flex justify-center">
               <Image
-                src={fighter.avatarUrl}
+                src={getImageUrl(fighter.avatarUrl)}
                 alt={fighter.fighterName}
                 width={124}
                 height={124}

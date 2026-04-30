@@ -19,6 +19,7 @@ import {
 } from "@/components/ui";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { getImageUrl } from "@/lib/utils";
 
 import { AdminPageHeader } from "../../components/AdminPageHeader";
 import { DraftHistoryDatabase } from "./DraftHistoryDatabase";
@@ -128,7 +129,7 @@ function PreDraftContent({ leagueId }: { leagueId: string }) {
                   <TableCell className="px-5 py-4 sm:px-6">
                     <div className="flex items-center gap-2.5">
                       <Avatar className="size-8">
-                        <AvatarImage src={participant.avatarUrl} alt={participant.name} />
+                        <AvatarImage src={getImageUrl(participant.avatarUrl)} alt={participant.name} />
                         <AvatarFallback>{participant.name.slice(0, 2)}</AvatarFallback>
                       </Avatar>
                       <span className="font-medium text-slate-900">{participant.name}</span>

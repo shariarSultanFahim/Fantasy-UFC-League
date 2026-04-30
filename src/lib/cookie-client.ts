@@ -1,17 +1,19 @@
+"use client";
 import Cookies from "js-cookie";
 
-if (typeof window === "undefined") {
-  throw new Error("cookie-client only works on the client");
-}
-
 export const cookie = {
-  get: (key: string): string | null => Cookies.get(key) ?? null,
-  set: (key: string, value: string, days = 365) =>
+  get: (key: string) => typeof window !== "undefined" ? (Cookies.get(key) ?? null) : null,
+  set: (key: string, value: string, days = 365) => {
+    if (typeof window === "undefined") return;
     Cookies.set(key, value, {
       expires: days,
       sameSite: "Lax",
       path: "/",
       secure: process.env.NODE_ENV === "production"
-    }),
-  remove: (key: string): void => Cookies.remove(key)
+    });
+  },
+  remove: (key: string) => {
+    if (typeof window === "undefined") return;
+    Cookies.remove(key);
+  }
 };

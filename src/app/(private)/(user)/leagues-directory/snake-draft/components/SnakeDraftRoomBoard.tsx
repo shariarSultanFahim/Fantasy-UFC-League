@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
@@ -19,6 +19,7 @@ import {
 
 import { LEAGUE_FIGHTERS } from "@/data/league-fighters";
 
+import { getImageUrl } from "@/lib/utils";
 import { Button, Card, Input } from "@/components/ui";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
@@ -451,7 +452,7 @@ export function SnakeDraftRoomBoard() {
                 >
                   <div className="relative h-36 overflow-hidden rounded-lg sm:h-40">
                     <Image
-                      src={fighter.avatarUrl}
+                      src={getImageUrl(fighter.avatarUrl)}
                       alt={fighter.name}
                       fill
                       className="object-cover"

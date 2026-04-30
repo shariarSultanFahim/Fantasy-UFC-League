@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { useRegister } from "@/lib/actions/auth";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -21,24 +24,41 @@ import { Input } from "@/components/ui/input";
 import { signUpFormSchema, type SignUpFormValues } from "../schema/sign-up-form-schema";
 
 const defaultValues: SignUpFormValues = {
+  name: "",
   username: "",
   email: "",
+  phone: "",
   password: "",
   confirmPassword: "",
   acceptTerms: false
 };
 
 export function SignUpForm() {
-  //   const router = useRouter();
+  const router = useRouter();
+  const { mutateAsync: register, isPending } = useRegister();
 
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpFormSchema),
     defaultValues
   });
 
-  const onSubmit = (values: SignUpFormValues) => {
-    console.log("Form submitted:", values);
-    // router.push("/login");
+  const onSubmit = async (values: SignUpFormValues) => {
+    try {
+      const response = await register({
+        data: {
+          name: values.name,
+          username: values.username,
+          email: values.email,
+          password: values.password,
+          phone: values.phone
+        }
+      });
+      
+      toast.success(response.message);
+      router.push(`/verify-email?email=${encodeURIComponent(values.email)}`);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error?.message || "Registration failed");
+    }
   };
 
   return (
@@ -55,17 +75,47 @@ export function SignUpForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="username"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel>Full Name</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="TheChamp123" />
+                    <Input {...field} placeholder="John Doe" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="TheChamp123" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="1234567890" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}
@@ -141,8 +191,8 @@ export function SignUpForm() {
               )}
             />
 
-            <Button type="submit" className="h-11 w-full text-sm font-semibold">
-              Create Account
+            <Button type="submit" disabled={isPending} className="h-11 w-full text-sm font-semibold">
+              {isPending ? "Creating Account..." : "Create Account"}
             </Button>
 
             <p className="text-center text-sm text-slate-600">

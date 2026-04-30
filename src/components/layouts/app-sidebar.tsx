@@ -33,6 +33,10 @@ import {
 
 import { Button } from "../ui";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useProfile } from "@/hooks";
+import { getImageUrl } from "@/lib/utils";
+import Cookies from "js-cookie";
+import { AUTH_SESSION_COOKIE, LOGIN_PATH } from "@/constants/auth";
 
 const data = {
   info: {
@@ -112,6 +116,12 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
+  const { profile } = useProfile();
+
+  const handleSignOut = () => {
+    Cookies.remove(AUTH_SESSION_COOKIE);
+    window.location.href = LOGIN_PATH;
+  };
   return (
     <Sidebar variant="inset" collapsible="icon" {...props}>
       <SidebarHeader>
@@ -164,19 +174,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem className="space-y-5">
             <div className="hidden flex-col gap-4 group-data-[collapsible=icon]:flex">
               <Avatar size="lg" className="h-8 w-8">
-                <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarImage src={getImageUrl(profile?.avatarUrl)} alt={profile?.name} />
+                <AvatarFallback>{profile?.name?.substring(0, 2).toUpperCase() || "AD"}</AvatarFallback>
               </Avatar>
             </div>
             <div className="group-data-[collapsible=icon]:hidden">
               <div className="flex items-center justify-start gap-4">
                 <Avatar size="lg">
-                  <AvatarImage src="https://github.com/shadcn.png" />
-                  <AvatarFallback>CN</AvatarFallback>
+                  <AvatarImage src={getImageUrl(profile?.avatarUrl)} alt={profile?.name} />
+                  <AvatarFallback>{profile?.name?.substring(0, 2).toUpperCase() || "AD"}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <h2 className="font-semibold">Gabriel</h2>
-                  <h3 className="text-sm text-gray-500">gabriel@fantasymma.com</h3>
+                  <h2 className="line-clamp-1 font-semibold">{profile?.name || "Admin"}</h2>
+                  <h3 className="line-clamp-1 text-sm text-gray-500">{profile?.email || "admin@example.com"}</h3>
                 </div>
               </div>
             </div>
@@ -184,7 +194,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <Button
                 variant="outline"
                 className="w-full border-secondary bg-transparent group-data-[collapsible=icon]:p-0"
-                onClick={() => (window.location.href = "/")}
+                onClick={handleSignOut}
               >
                 <LogOut className="size-4 group-data-[collapsible=icon]:h-5 group-data-[collapsible=icon]:w-5" />
                 <span className="group-data-[collapsible=icon]:hidden">Sign Out</span>

@@ -31,7 +31,7 @@ export function RankingsDatabase() {
       fighter.nationality.toLowerCase().includes(query.toLowerCase());
 
     const matchesDivision =
-      filters.division === "All Divisions" || fighter.division === filters.division;
+      filters.divisionId === "All Divisions" || (typeof fighter.division === 'string' ? fighter.division === filters.divisionId : fighter.division?.name === filters.divisionId);
 
     const matchesNationality =
       filters.nationality === "All Nationalities" || fighter.nationality === filters.nationality;
@@ -43,11 +43,7 @@ export function RankingsDatabase() {
       (filters.rankRange === "Top 15" && fighter.rank !== null && fighter.rank <= 15) ||
       (filters.rankRange === "Unranked" && fighter.rank === null);
 
-    const matchesWinsRange = fighter.wins >= filters.minWins && fighter.losses <= filters.maxLosses;
-
-    return (
-      matchesQuery && matchesDivision && matchesNationality && matchesRankRange && matchesWinsRange
-    );
+    return matchesQuery && matchesDivision && matchesNationality && matchesRankRange;
   });
 
   const startIndex = (page - 1) * STATIC_LIMIT;

@@ -5,19 +5,19 @@ import * as React from "react";
 
 import { Button } from "@/components/ui";
 import {
-    Sheet,
-    SheetClose,
-    SheetContent,
-    SheetDescription,
-    SheetFooter,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger
 } from "@/components/ui/sheet";
 import type { FighterFilters } from "@/types";
 
 import { FilterCombobox } from "./FilterCombobox";
-import { RANK_RANGE_OPTIONS, NATIONALITY_OPTIONS } from "./fighters-data";
+import { RANK_RANGE_OPTIONS, getCountryNames } from "./fighters-data";
 import { useDivisions } from "@/hooks";
 
 interface FighterFiltersSheetProps {
@@ -32,21 +32,26 @@ export function FighterFiltersSheet({
   onResetFilters
 }: FighterFiltersSheetProps) {
   const { divisions } = useDivisions({ limit: 100 });
+  const [countries, setCountries] = React.useState<string[]>([]);
+
+  React.useEffect(() => {
+    getCountryNames().then(setCountries);
+  }, []);
 
   const divisionOptions = React.useMemo(() => {
     const apiOptions = (divisions || []).map((d) => ({ value: d.id, label: d.name }));
-    return [{ value: "All Divisions", label: "All Divisions" }, ...apiOptions];
+    return [{ value: "", label: "All Divisions" }, ...apiOptions];
   }, [divisions]);
 
-  const rankOptions = React.useMemo(() => 
+  const rankOptions = React.useMemo(() =>
     RANK_RANGE_OPTIONS.map((r) => ({ value: r, label: r })),
     []
   );
 
-  const nationalityOptions = React.useMemo(() => 
-    NATIONALITY_OPTIONS.map((n) => ({ value: n, label: n })),
-    []
-  );
+  const nationalityOptions = React.useMemo(() => {
+    const options = countries.map((n) => ({ value: n, label: n }));
+    return [{ value: "", label: "All Nationalities" }, ...options];
+  }, [countries]);
 
   return (
     <Sheet>
@@ -64,21 +69,21 @@ export function FighterFiltersSheet({
         <div className="space-y-5 px-5 py-5">
           <FilterCombobox
             label="Division"
-            value={filters.division}
+            value={filters.divisionId || ""}
             options={divisionOptions}
-            onValueChange={(division) => onFilterChange({ ...filters, division })}
+            onValueChange={(divisionId) => onFilterChange({ ...filters, divisionId: divisionId || undefined })}
           />
           <FilterCombobox
             label="Rank Range"
-            value={filters.rankRange}
+            value={filters.rankRange || ""}
             options={rankOptions}
             onValueChange={(rankRange) => onFilterChange({ ...filters, rankRange })}
           />
           <FilterCombobox
             label="Nationality"
-            value={filters.nationality}
+            value={filters.nationality || ""}
             options={nationalityOptions}
-            onValueChange={(nationality) => onFilterChange({ ...filters, nationality })}
+            onValueChange={(nationality) => onFilterChange({ ...filters, nationality: nationality || undefined })}
           />
         </div>
 

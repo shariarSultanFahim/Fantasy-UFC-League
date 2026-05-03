@@ -14,7 +14,7 @@ export type {
   EventFormValues,
   EventStatus
 } from "./event";
-export type { Fighter, FighterFilters } from "./fighter";
+export type { IFighter, IFighterFilters, IFighterResponse, Fighter, FighterFilters } from "./fighter";
 export type { League, LeagueStatus } from "./league";
 export type {
   DraftPickItem,

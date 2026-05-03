@@ -1,34 +1,67 @@
-export interface Fighter {
+import { IApiResponse } from "./auth";
+
+export interface IFighter {
   id: string;
   name: string;
   nickname: string;
   nationality: string;
-  division: string;
+  divisionId: string;
+  rank: number | null;
   wins: number;
   losses: number;
   draws: number;
-  points: number;
-  rank: number | null;
-  avatarUrl: string;
-  age: number;
-  height: string;
-  reach: string;
-  koWins: number;
-  submissionWins: number;
-  decisionWins: number;
-  titleDefenses: number;
-  upcomingOpponent: string;
-  upcomingEvent: string;
-  scheduledDate: string;
-  lastFiveFightsAvgPoints: number;
-  pointsChange: number;
-  formerChampionDivisions?: string[];
+  avgL5: number;
+  bio: string | null;
+  avatarUrl: string | null;
+  age: number | null;
+  height: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  division?: {
+    id: string;
+    name: string;
+  };
 }
 
-export interface FighterFilters {
-  division: string;
-  rankRange: string;
-  nationality: string;
-  minWins: number;
-  maxLosses: number;
+export interface IPaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPage: number;
 }
+
+export interface IFighterFilters {
+  searchTerm?: string;
+  divisionId?: string;
+  isActive?: boolean;
+  nationality?: string;
+  minRank?: number;
+  maxRank?: number;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+  // UI-only helper for rank ranges
+  rankRange?: string;
+}
+
+export interface IFighterResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: IFighter;
+}
+
+export interface IFighterListResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: {
+    meta: IPaginationMeta;
+    data: IFighter[];
+  };
+}
+
+export type Fighter = IFighter;
+export type FighterFilters = IFighterFilters;

@@ -29,11 +29,9 @@ export const NATIONALITY_OPTIONS = [
 ];
 
 export const DEFAULT_FILTERS: FighterFilters = {
-  division: "All Divisions",
+  divisionId: "All Divisions",
   rankRange: "All Ranks",
   nationality: "All Nationalities",
-  minWins: 0,
-  maxLosses: 100
 };
 
 export const FIGHTERS_DATA: Fighter[] = [
@@ -42,11 +40,11 @@ export const FIGHTERS_DATA: Fighter[] = [
     name: "Islam Makhachev",
     nickname: "The Eagle",
     nationality: "Russia",
-    division: "Men's Lightweight",
+    divisionId: "Men's Lightweight",
     wins: 25,
     losses: 1,
     draws: 0,
-    points: 2847,
+    avgL5: 2847,
     rank: 1,
     avatarUrl:
       "https://images.unsplash.com/photo-1521119989659-a83eee488004?q=80&w=400&auto=format&fit=crop",
@@ -60,7 +58,7 @@ export const FIGHTERS_DATA: Fighter[] = [
     upcomingOpponent: "Dustin Poirier",
     upcomingEvent: "UFC 304",
     scheduledDate: "July 27, 2024",
-    lastFiveFightsAvgPoints: 92.4,
+    lastFiveFightsAvgavgL5: 92.4,
     pointsChange: 8,
     formerChampionDivisions: []
   },
@@ -69,11 +67,11 @@ export const FIGHTERS_DATA: Fighter[] = [
     name: "Jon Jones",
     nickname: "Bones",
     nationality: "USA",
-    division: "Men's Heavyweight",
+    divisionId: "Men's Heavyweight",
     wins: 27,
     losses: 1,
     draws: 0,
-    points: 2756,
+    avgL5: 2756,
     rank: 2,
     avatarUrl:
       "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop",
@@ -87,7 +85,7 @@ export const FIGHTERS_DATA: Fighter[] = [
     upcomingOpponent: "Stipe Miocic",
     upcomingEvent: "UFC 309",
     scheduledDate: "November 16, 2024",
-    lastFiveFightsAvgPoints: 88.2,
+    lastFiveFightsAvgavgL5: 88.2,
     pointsChange: 5,
     formerChampionDivisions: ["Men's Light Heavyweight", "Men's Heavyweight"]
   },
@@ -96,11 +94,11 @@ export const FIGHTERS_DATA: Fighter[] = [
     name: "Alex Pereira",
     nickname: "Poatan",
     nationality: "Brazil",
-    division: "Men's Welterweight",
+    divisionId: "Men's Welterweight",
     wins: 11,
     losses: 2,
     draws: 0,
-    points: 2456,
+    avgL5: 2456,
     rank: 3,
     avatarUrl:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
@@ -114,7 +112,7 @@ export const FIGHTERS_DATA: Fighter[] = [
     upcomingOpponent: "Dricus du Plessis",
     upcomingEvent: "UFC 305",
     scheduledDate: "August 3, 2024",
-    lastFiveFightsAvgPoints: 85.6,
+    lastFiveFightsAvgavgL5: 85.6,
     pointsChange: 12,
     formerChampionDivisions: ["Men's Middleweight"]
   },
@@ -123,11 +121,11 @@ export const FIGHTERS_DATA: Fighter[] = [
     name: "Israel Adesanya",
     nickname: "Stylebender",
     nationality: "Australia",
-    division: "Men's Middleweight",
+    divisionId: "Men's Middleweight",
     wins: 24,
     losses: 3,
     draws: 0,
-    points: 2156,
+    avgL5: 2156,
     rank: 4,
     avatarUrl:
       "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=400&auto=format&fit=crop",
@@ -141,7 +139,7 @@ export const FIGHTERS_DATA: Fighter[] = [
     upcomingOpponent: "Sean Strickland",
     upcomingEvent: "UFC 293",
     scheduledDate: "September 9, 2023",
-    lastFiveFightsAvgPoints: 79.3,
+    lastFiveFightsAvgavgL5: 79.3,
     pointsChange: -2,
     formerChampionDivisions: ["Men's Middleweight"]
   },
@@ -150,11 +148,11 @@ export const FIGHTERS_DATA: Fighter[] = [
     name: "Leon Edwards",
     nickname: "Rocky",
     nationality: "USA",
-    division: "Men's Welterweight",
+    divisionId: "Men's Welterweight",
     wins: 21,
     losses: 3,
     draws: 0,
-    points: 2045,
+    avgL5: 2045,
     rank: 5,
     avatarUrl:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop",
@@ -168,7 +166,7 @@ export const FIGHTERS_DATA: Fighter[] = [
     upcomingOpponent: "Colby Covington",
     upcomingEvent: "UFC 295",
     scheduledDate: "November 11, 2023",
-    lastFiveFightsAvgPoints: 82.1,
+    lastFiveFightsAvgavgL5: 82.1,
     pointsChange: 6,
     formerChampionDivisions: ["Men's Welterweight"]
   },
@@ -177,11 +175,11 @@ export const FIGHTERS_DATA: Fighter[] = [
     name: "Alexander Volkanovski",
     nickname: "The Great",
     nationality: "Australia",
-    division: "Men's Featherweight",
+    divisionId: "Men's Featherweight",
     wins: 25,
     losses: 2,
     draws: 0,
-    points: 1944,
+    avgL5: 1944,
     rank: 6,
     avatarUrl:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
@@ -195,7 +193,7 @@ export const FIGHTERS_DATA: Fighter[] = [
     upcomingOpponent: "TBA",
     upcomingEvent: "TBA",
     scheduledDate: "TBA",
-    lastFiveFightsAvgPoints: 86.5,
+    lastFiveFightsAvgavgL5: 86.5,
     pointsChange: -1,
     formerChampionDivisions: ["Men's Featherweight"]
   },
@@ -204,11 +202,11 @@ export const FIGHTERS_DATA: Fighter[] = [
     name: "Ilia Topuria",
     nickname: "El Matador",
     nationality: "Brazil",
-    division: "Men's Featherweight",
+    divisionId: "Men's Featherweight",
     wins: 15,
     losses: 0,
     draws: 0,
-    points: 1845,
+    avgL5: 1845,
     rank: 7,
     avatarUrl:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop",
@@ -222,7 +220,7 @@ export const FIGHTERS_DATA: Fighter[] = [
     upcomingOpponent: "Alexander Volkanovski",
     upcomingEvent: "UFC 298",
     scheduledDate: "February 17, 2024",
-    lastFiveFightsAvgPoints: 84.2,
+    lastFiveFightsAvgavgL5: 84.2,
     pointsChange: 15,
     formerChampionDivisions: []
   },
@@ -231,11 +229,11 @@ export const FIGHTERS_DATA: Fighter[] = [
     name: "Conor McGregor",
     nickname: "The Notorious",
     nationality: "Ireland",
-    division: "Men's Lightweight",
+    divisionId: "Men's Lightweight",
     wins: 22,
     losses: 6,
     draws: 0,
-    points: 1701,
+    avgL5: 1701,
     rank: 8,
     avatarUrl:
       "https://images.unsplash.com/photo-1521119989659-a83eee488004?q=80&w=400&auto=format&fit=crop",
@@ -249,7 +247,7 @@ export const FIGHTERS_DATA: Fighter[] = [
     upcomingOpponent: "Michael Chandler",
     upcomingEvent: "UFC 303",
     scheduledDate: "June 29, 2024",
-    lastFiveFightsAvgPoints: 87.4,
+    lastFiveFightsAvgavgL5: 87.4,
     pointsChange: 12,
     formerChampionDivisions: ["Men's Featherweight", "Men's Lightweight"]
   },
@@ -258,11 +256,11 @@ export const FIGHTERS_DATA: Fighter[] = [
     name: "Sean Strickland",
     nickname: "Tarzan",
     nationality: "USA",
-    division: "Men's Middleweight",
+    divisionId: "Men's Middleweight",
     wins: 27,
     losses: 5,
     draws: 0,
-    points: 1645,
+    avgL5: 1645,
     rank: null,
     avatarUrl:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
@@ -276,7 +274,7 @@ export const FIGHTERS_DATA: Fighter[] = [
     upcomingOpponent: "TBA",
     upcomingEvent: "TBA",
     scheduledDate: "TBA",
-    lastFiveFightsAvgPoints: 75.8,
+    lastFiveFightsAvgavgL5: 75.8,
     pointsChange: 3,
     formerChampionDivisions: []
   },
@@ -285,11 +283,11 @@ export const FIGHTERS_DATA: Fighter[] = [
     name: "Khabib Nurmagomedov",
     nickname: "The Eagle",
     nationality: "Russia",
-    division: "Men's Lightweight",
+    divisionId: "Men's Lightweight",
     wins: 29,
     losses: 0,
     draws: 0,
-    points: 1523,
+    avgL5: 1523,
     rank: null,
     avatarUrl:
       "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop",
@@ -303,7 +301,7 @@ export const FIGHTERS_DATA: Fighter[] = [
     upcomingOpponent: "Retired",
     upcomingEvent: "N/A",
     scheduledDate: "N/A",
-    lastFiveFightsAvgPoints: 91.2,
+    lastFiveFightsAvgavgL5: 91.2,
     pointsChange: 0,
     formerChampionDivisions: ["Men's Lightweight"]
   }

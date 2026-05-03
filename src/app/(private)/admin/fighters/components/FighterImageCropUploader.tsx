@@ -9,6 +9,7 @@ import { Button } from "@/components/ui";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { getImageUrl } from "@/lib/utils";
 
 interface FighterImageCropUploaderProps {
   value: string;
@@ -132,7 +133,7 @@ export function FighterImageCropUploader({ value, onChange }: FighterImageCropUp
           <Label>Preview</Label>
           <div className="h-40 w-40 overflow-hidden rounded-lg border">
             <NextImage
-              src={value}
+              src={getImageUrl(value)}
               alt="Fighter preview"
               width={160}
               height={160}

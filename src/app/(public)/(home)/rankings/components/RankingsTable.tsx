@@ -63,10 +63,10 @@ export function RankingsTable({ fighters, onFighterClick }: RankingsTableProps) 
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="py-4 text-sm">{fighter.division}</TableCell>
+                <TableCell className="py-4 text-sm">{fighter.division?.name || fighter.divisionId || "-"}</TableCell>
                 <TableCell className="py-4 text-sm">{fighter.nationality}</TableCell>
                 <TableCell className="py-4 text-right font-semibold text-emerald-600">
-                  {fighter.points}
+                  {fighter.avgL5}
                 </TableCell>
                 <TableCell className="py-4 text-right font-semibold">{fighter.wins}</TableCell>
                 <TableCell className="py-4 pr-5 text-right font-semibold sm:pr-6">

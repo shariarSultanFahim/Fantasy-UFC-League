@@ -49,48 +49,20 @@ export function RankingsFiltersSheet({
         <div className="space-y-5 px-5 py-5">
           <FilterCombobox
             label="Division"
-            value={filters.division}
+            value={filters.divisionId ?? ""}
             options={DIVISION_OPTIONS}
-            onValueChange={(division) => onFilterChange({ ...filters, division })}
+            onValueChange={(divisionId) => onFilterChange({ ...filters, divisionId })}
           />
           <FilterCombobox
             label="Rank Range"
-            value={filters.rankRange}
+            value={filters.rankRange ?? ""}
             options={RANK_RANGE_OPTIONS}
             onValueChange={(rankRange) => onFilterChange({ ...filters, rankRange })}
           />
 
-          <div className="space-y-2">
-            <Label htmlFor="min-wins">Min Wins</Label>
-            <Input
-              id="min-wins"
-              type="number"
-              min="0"
-              value={filters.minWins}
-              onChange={(e) =>
-                onFilterChange({ ...filters, minWins: parseInt(e.target.value) || 0 })
-              }
-              placeholder="0"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="max-losses">Max Losses</Label>
-            <Input
-              id="max-losses"
-              type="number"
-              min="0"
-              value={filters.maxLosses}
-              onChange={(e) =>
-                onFilterChange({ ...filters, maxLosses: parseInt(e.target.value) || 100 })
-              }
-              placeholder="100"
-            />
-          </div>
-
           <FilterCombobox
             label="Nationality"
-            value={filters.nationality}
+            value={filters.nationality ?? ""}
             options={NATIONALITY_OPTIONS}
             onValueChange={(nationality) => onFilterChange({ ...filters, nationality })}
           />

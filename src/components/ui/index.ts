@@ -13,4 +13,5 @@ export * from "./table";
 export * from "./textarea";
 export * from "./tooltip";
 export * from "./dialog";
+export * from "./switch";
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { SlidersHorizontal } from "lucide-react";
+import * as React from "react";
 
 import { Button } from "@/components/ui";
 import {
@@ -16,7 +17,8 @@ import {
 import type { FighterFilters } from "@/types";
 
 import { FilterCombobox } from "./FilterCombobox";
-import { DIVISION_OPTIONS, NATIONALITY_OPTIONS, RANK_RANGE_OPTIONS } from "./fighters-data";
+import { RANK_RANGE_OPTIONS, NATIONALITY_OPTIONS } from "./fighters-data";
+import { useDivisions } from "@/hooks";
 
 interface FighterFiltersSheetProps {
   filters: FighterFilters;
@@ -29,6 +31,23 @@ export function FighterFiltersSheet({
   onFilterChange,
   onResetFilters
 }: FighterFiltersSheetProps) {
+  const { divisions } = useDivisions({ limit: 100 });
+
+  const divisionOptions = React.useMemo(() => {
+    const apiOptions = (divisions || []).map((d) => ({ value: d.id, label: d.name }));
+    return [{ value: "All Divisions", label: "All Divisions" }, ...apiOptions];
+  }, [divisions]);
+
+  const rankOptions = React.useMemo(() => 
+    RANK_RANGE_OPTIONS.map((r) => ({ value: r, label: r })),
+    []
+  );
+
+  const nationalityOptions = React.useMemo(() => 
+    NATIONALITY_OPTIONS.map((n) => ({ value: n, label: n })),
+    []
+  );
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -46,19 +65,19 @@ export function FighterFiltersSheet({
           <FilterCombobox
             label="Division"
             value={filters.division}
-            options={DIVISION_OPTIONS}
+            options={divisionOptions}
             onValueChange={(division) => onFilterChange({ ...filters, division })}
           />
           <FilterCombobox
             label="Rank Range"
             value={filters.rankRange}
-            options={RANK_RANGE_OPTIONS}
+            options={rankOptions}
             onValueChange={(rankRange) => onFilterChange({ ...filters, rankRange })}
           />
           <FilterCombobox
             label="Nationality"
             value={filters.nationality}
-            options={NATIONALITY_OPTIONS}
+            options={nationalityOptions}
             onValueChange={(nationality) => onFilterChange({ ...filters, nationality })}
           />
         </div>

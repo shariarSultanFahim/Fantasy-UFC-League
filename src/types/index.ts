@@ -24,4 +24,6 @@ export type {
 } from "./league-simulation";
 export type { AdminProfileFormValues, AdminProfileState } from "./profile";
 export type { ScoringSettings } from "./scoring";
-export type { User, AuthRole, AuthSession, IApiResponse, ILoginResponse } from "./auth";
+export type { IDivision, IDivisionFormValues } from "./division";
+export type { User, AuthRole, AuthSession, IApiResponse, IPaginatedResponse, ILoginResponse } from "./auth";
+

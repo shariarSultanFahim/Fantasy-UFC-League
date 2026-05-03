@@ -18,12 +18,14 @@ import { cn } from "@/lib/utils";
 interface FilterComboboxProps {
   label: string;
   value: string;
-  options: string[];
+  options: { value: string; label: string }[];
   onValueChange: (value: string) => void;
 }
 
 export function FilterCombobox({ label, value, options, onValueChange }: FilterComboboxProps) {
   const [open, setOpen] = React.useState(false);
+
+  const selectedLabel = options.find((option) => option.value === value)?.label;
 
   return (
     <div className="space-y-2">
@@ -31,7 +33,7 @@ export function FilterCombobox({ label, value, options, onValueChange }: FilterC
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between">
-            <span className="truncate">{value}</span>
+            <span className="truncate">{selectedLabel || `Select ${label.toLowerCase()}...`}</span>
             <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -43,16 +45,16 @@ export function FilterCombobox({ label, value, options, onValueChange }: FilterC
               <CommandGroup>
                 {options.map((option) => (
                   <CommandItem
-                    key={option}
-                    value={option}
-                    onSelect={(selectedValue: string) => {
-                      onValueChange(selectedValue === value ? options[0] : selectedValue);
+                    key={option.value}
+                    value={option.label}
+                    onSelect={() => {
+                      onValueChange(option.value === value ? "" : option.value);
                       setOpen(false);
                     }}
                   >
-                    {option}
+                    {option.label}
                     <Check
-                      className={cn("ml-auto size-4", value === option ? "opacity-100" : "opacity-0")}
+                      className={cn("ml-auto size-4", value === option.value ? "opacity-100" : "opacity-0")}
                     />
                   </CommandItem>
                 ))}

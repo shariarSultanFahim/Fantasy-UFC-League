@@ -24,7 +24,8 @@ import {
 import { fighterFormSchema, type FighterFormValues } from "../schema/fighter-form-schema";
 import { FighterCombobox } from "./FighterCombobox";
 import { FighterImageCropUploader } from "./FighterImageCropUploader";
-import { FORM_DIVISION_OPTIONS } from "./fighters-data";
+import { useDivisions } from "@/hooks";
+import React from "react";
 
 interface FighterFormProps {
   mode: "create" | "edit";
@@ -47,6 +48,8 @@ const defaultValues: FighterFormValues = {
 };
 
 export function FighterForm({ mode, initialValues, nationalityOptions }: FighterFormProps) {
+  const { divisions } = useDivisions({ limit: 100 }); // Fetch all divisions for the dropdown
+
   const form = useForm<FighterFormValues>({
     resolver: zodResolver(fighterFormSchema),
     defaultValues: {
@@ -54,6 +57,17 @@ export function FighterForm({ mode, initialValues, nationalityOptions }: Fighter
       ...initialValues
     }
   });
+
+  const divisionOptions = React.useMemo(() =>
+    (divisions || []).map((d) => ({ value: d.id, label: d.name })),
+    [divisions]
+  );
+
+  const nationalityMappedOptions = React.useMemo(() =>
+
+    nationalityOptions.map((n) => ({ value: n, label: n })),
+    [nationalityOptions]
+  );
 
   const onSubmit = () => {
     toast.success(
@@ -114,7 +128,7 @@ export function FighterForm({ mode, initialValues, nationalityOptions }: Fighter
                     <FormControl>
                       <FighterCombobox
                         value={field.value}
-                        options={FORM_DIVISION_OPTIONS.filter((item) => item !== "All Divisions")}
+                        options={divisionOptions}
                         placeholder="Select division"
                         searchPlaceholder="Search divisions..."
                         onValueChange={field.onChange}
@@ -134,7 +148,7 @@ export function FighterForm({ mode, initialValues, nationalityOptions }: Fighter
                     <FormControl>
                       <FighterCombobox
                         value={field.value}
-                        options={nationalityOptions}
+                        options={nationalityMappedOptions}
                         placeholder="Select nationality"
                         searchPlaceholder="Search nationalities..."
                         onValueChange={field.onChange}

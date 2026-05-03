@@ -14,9 +14,26 @@ export interface User {
 
 export interface IApiResponse<T> {
   success: boolean;
+  statusCode?: number;
   message: string;
   data: T;
 }
+
+export interface IPaginatedResponse<T> {
+  success: boolean;
+  statusCode?: number;
+  message: string;
+  data: {
+    data: T[];
+    meta: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPage: number;
+    };
+  };
+}
+
 
 export interface ILoginResponse {
   accessToken: string;

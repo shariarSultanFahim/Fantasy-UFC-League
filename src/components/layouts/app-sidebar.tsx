@@ -11,8 +11,10 @@ import {
   FileText,
   HeartHandshake,
   LayoutDashboard,
+  Layers,
   LogOut,
   ShieldCheck,
+
   Sword,
   Trophy,
   UserRoundPen
@@ -62,6 +64,13 @@ const data = {
           url: "/admin/fighters",
           icon: Sword
         },
+        {
+          title: "Divisions",
+          url: "/admin/divisions",
+          icon: Layers
+        },
+
+
         {
           title: "Draft Management",
           url: "/admin/draft-management",
@@ -186,7 +195,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </Avatar>
                 <div>
                   <h2 className="line-clamp-1 font-semibold">{profile?.name || "Admin"}</h2>
-                  <h3 className="line-clamp-1 text-sm text-gray-500">{profile?.email || "admin@example.com"}</h3>
+                  {/* <h3 className="line-clamp-1 text-sm text-gray-500">{profile?.email || "admin@example.com"}</h3> */}
                 </div>
               </div>
             </div>

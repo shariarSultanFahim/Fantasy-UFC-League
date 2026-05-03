@@ -19,7 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 
 interface FighterComboboxProps {
   value: string;
-  options: string[];
+  options: { value: string; label: string }[];
   placeholder: string;
   searchPlaceholder: string;
   onValueChange: (value: string) => void;
@@ -34,6 +34,8 @@ export function FighterCombobox({
 }: FighterComboboxProps) {
   const [open, setOpen] = React.useState(false);
 
+  const selectedLabel = options.find((option) => option.value === value)?.label;
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -44,7 +46,7 @@ export function FighterCombobox({
           aria-expanded={open}
           className="w-full justify-between"
         >
-          <span className="truncate">{value || placeholder}</span>
+          <span className="truncate">{selectedLabel || placeholder}</span>
           <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -56,16 +58,16 @@ export function FighterCombobox({
             <CommandGroup>
               {options.map((option) => (
                 <CommandItem
-                  key={option}
-                  value={option}
-                  onSelect={(selectedValue: string) => {
-                    onValueChange(selectedValue);
+                  key={option.value}
+                  value={option.label}
+                  onSelect={() => {
+                    onValueChange(option.value);
                     setOpen(false);
                   }}
                 >
-                  {option}
+                  {option.label}
                   <Check
-                    className={cn("ml-auto size-4", value === option ? "opacity-100" : "opacity-0")}
+                    className={cn("ml-auto size-4", value === option.value ? "opacity-100" : "opacity-0")}
                   />
                 </CommandItem>
               ))}

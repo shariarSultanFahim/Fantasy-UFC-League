@@ -29,3 +29,4 @@ export type { User, AuthRole, AuthSession, IApiResponse, IPaginatedResponse, ILo
 export type { ILegalDocument, ILegalResponse, ILegalListResponse, LegalDocumentType } from "./legal";
 export * from "./newsletter";
 export * from "./scoring";
+export * from "./contact";

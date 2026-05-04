@@ -1,17 +1,62 @@
-import { Clock3, Mail, MessageCircle, Send } from "lucide-react";
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Clock3, Loader2, Mail, MessageCircle, Send } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useSendMessage } from "@/lib/actions/contact";
+
+const contactSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  subject: z.string().min(3, "Subject must be at least 3 characters"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+});
+
+type ContactFormValues = z.infer<typeof contactSchema>;
 
 export default function ContactPage() {
+  const { mutate: sendMessage, isPending } = useSendMessage();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ContactFormValues>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+    },
+  });
+
+  const onSubmit = (data: ContactFormValues) => {
+    sendMessage(data, {
+      onSuccess: (response) => {
+        toast.success(response.message || "Your message has been sent successfully!");
+        reset();
+      },
+      onError: (error: any) => {
+        toast.error(error?.response?.data?.message || "Failed to send message. Please try again.");
+      },
+    });
+  };
+
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-10 text-slate-900 sm:px-6 lg:px-8 lg:py-12">
       <div className="mx-auto w-full max-w-6xl">
         <section className="rounded-xl bg-slate-950 px-6 py-14 text-center text-white shadow-md sm:px-10">
-          <h1 className="text-4xl font-black tracking-tight sm:text-5xl">CONTACT US</h1>
+          <h1 className="text-4xl font-black tracking-tight sm:text-5xl uppercase">CONTACT US</h1>
           <p className="mx-auto mt-5 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
             Need help with your roster or have feedback for the league? We&apos;re here to help you
             stay in the fight.
@@ -25,20 +70,24 @@ export default function ContactPage() {
                 <h2 className="text-3xl font-extrabold tracking-tight">Send us a message</h2>
               </div>
 
-              <form className="space-y-5">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label
-                      htmlFor="full-name"
+                      htmlFor="name"
                       className="text-[11px] font-bold tracking-[0.2em] text-slate-500 uppercase"
                     >
                       Name
                     </Label>
                     <Input
-                      id="full-name"
+                      id="name"
                       placeholder="Your full name"
                       className="h-11 border-slate-200 bg-slate-50"
+                      {...register("name")}
                     />
+                    {errors.name && (
+                      <p className="text-[11px] font-medium text-red-500">{errors.name.message}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -53,8 +102,30 @@ export default function ContactPage() {
                       type="email"
                       placeholder="champion@ffleague.com"
                       className="h-11 border-slate-200 bg-slate-50"
+                      {...register("email")}
                     />
+                    {errors.email && (
+                      <p className="text-[11px] font-medium text-red-500">{errors.email.message}</p>
+                    )}
                   </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="subject"
+                    className="text-[11px] font-bold tracking-[0.2em] text-slate-500 uppercase"
+                  >
+                    Subject
+                  </Label>
+                  <Input
+                    id="subject"
+                    placeholder="What is this regarding?"
+                    className="h-11 border-slate-200 bg-slate-50"
+                    {...register("subject")}
+                  />
+                  {errors.subject && (
+                    <p className="text-[11px] font-medium text-red-500">{errors.subject.message}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -68,12 +139,28 @@ export default function ContactPage() {
                     id="message"
                     placeholder="How can we help you today?"
                     className="min-h-40 resize-none border-slate-200 bg-slate-50"
+                    {...register("message")}
                   />
+                  {errors.message && (
+                    <p className="text-[11px] font-medium text-red-500">{errors.message.message}</p>
+                  )}
                 </div>
 
-                <Button className="h-11 bg-slate-950 px-7 text-[13px] font-bold tracking-[0.18em] text-white uppercase hover:bg-slate-800">
-                  Send Message
-                  <Send className="h-4 w-4" />
+                <Button
+                  disabled={isPending}
+                  className="h-11 bg-slate-950 px-7 text-[13px] font-bold tracking-[0.18em] text-white uppercase hover:bg-slate-800 disabled:opacity-70"
+                >
+                  {isPending ? (
+                    <>
+                      Sending...
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    </>
+                  ) : (
+                    <>
+                      Send Message
+                      <Send className="h-4 w-4" />
+                    </>
+                  )}
                 </Button>
               </form>
             </CardContent>

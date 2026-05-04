@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { RotateCcw, Save } from "lucide-react";
+import { RotateCcw, Save, Loader2 } from "lucide-react";
 import { SerializedEditorState } from "lexical";
 
 import { Editor } from "@/components/blocks/editor-00/editor";
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 interface LegalEditorProps {
   initialContent?: SerializedEditorState;
   onSave: (content: SerializedEditorState | undefined) => void;
+  isSaving?: boolean;
 }
 
 const defaultInitialValue = {
@@ -23,30 +24,36 @@ const defaultInitialValue = {
             format: 0,
             mode: "normal",
             style: "",
-            text: "Hello World 🚀",
+            text: "Start writing your legal document here...",
             type: "text",
-            version: 1
-          }
+            version: 1,
+          },
         ],
         direction: "ltr",
         format: "",
         indent: 0,
         type: "paragraph",
-        version: 1
-      }
+        version: 1,
+      },
     ],
     direction: "ltr",
     format: "",
     indent: 0,
     type: "root",
-    version: 1
-  }
+    version: 1,
+  },
 } as unknown as SerializedEditorState;
 
-export function LegalEditor({ initialContent, onSave }: LegalEditorProps) {
+export function LegalEditor({ initialContent, onSave, isSaving }: LegalEditorProps) {
   const [content, setContent] = useState<SerializedEditorState | undefined>(
     initialContent || defaultInitialValue
   );
+
+  useEffect(() => {
+    if (initialContent) {
+      setContent(initialContent);
+    }
+  }, [initialContent]);
 
   const handleSave = () => {
     onSave(content);
@@ -66,18 +73,24 @@ export function LegalEditor({ initialContent, onSave }: LegalEditorProps) {
         <Button
           variant="ghost"
           onClick={handleReset}
+          disabled={isSaving}
           className="font-medium text-[#475467] hover:text-[#202c45]"
         >
           <RotateCcw className="mr-2 h-4 w-4" />
-          Reset to Default
+          Reset to {initialContent ? "Saved" : "Default"}
         </Button>
 
         <Button
           onClick={handleSave}
-          className="text-white shadow-sm shadow-primary/20 hover:bg-primary/90"
+          disabled={isSaving}
+          className="min-w-[140px] text-white shadow-sm shadow-primary/20 hover:bg-primary/90"
         >
-          <Save className="mr-2 h-4 w-4" />
-          Save Changes
+          {isSaving ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Save className="mr-2 h-4 w-4" />
+          )}
+          {isSaving ? "Saving..." : "Save Changes"}
         </Button>
       </div>
     </div>

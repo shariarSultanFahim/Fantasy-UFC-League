@@ -18,7 +18,7 @@ import { FontFamilyToolbarPlugin } from "@/components/editor/plugins/toolbar/fon
 import { FontFormatToolbarPlugin } from "@/components/editor/plugins/toolbar/font-format-toolbar-plugin"
 import { ToolbarPlugin } from "@/components/editor/plugins/toolbar/toolbar-plugin"
 
-export function Plugins() {
+export function Plugins({ readOnly = false }: { readOnly?: boolean }) {
   const [floatingAnchorElem, setFloatingAnchorElem] =
     useState<HTMLDivElement | null>(null)
 
@@ -31,33 +31,34 @@ export function Plugins() {
   return (
     <div className="relative flex flex-col w-full h-full">
       {/* toolbar plugins */}
-      <div className="flex bg-white p-2 border-b border-border items-center">
-        <ToolbarPlugin>
-          {() => (
-            <div className="flex gap-2 items-center flex-wrap">
-              <BlockFormatDropDown>
-                <FormatParagraph />
-                <FormatHeading levels={["h1", "h2", "h3"]} />
-                <FormatBulletedList />
-                <FormatNumberedList />
-                <FormatCheckList />
-                <FormatQuote />
-              </BlockFormatDropDown>
-              <FontFamilyToolbarPlugin />
-              <ElementFormatToolbarPlugin />
-              <FontFormatToolbarPlugin />
-
-            </div>
-          )}
-        </ToolbarPlugin>
-      </div>
+      {!readOnly && (
+        <div className="flex bg-white p-2 border-b border-border items-center">
+          <ToolbarPlugin>
+            {() => (
+              <div className="flex gap-2 items-center flex-wrap">
+                <BlockFormatDropDown>
+                  <FormatParagraph />
+                  <FormatHeading levels={["h1", "h2", "h3"]} />
+                  <FormatBulletedList />
+                  <FormatNumberedList />
+                  <FormatCheckList />
+                  <FormatQuote />
+                </BlockFormatDropDown>
+                <FontFamilyToolbarPlugin />
+                <ElementFormatToolbarPlugin />
+                <FontFormatToolbarPlugin />
+              </div>
+            )}
+          </ToolbarPlugin>
+        </div>
+      )}
 
       <div className="relative">
         <RichTextPlugin
           contentEditable={
-            <div className="p-4" style={{ minHeight: "400px" }}>
+            <div className={readOnly ? "" : "p-4"} style={!readOnly ? { minHeight: "400px" } : {}}>
               <div className="outline-none min-h-100" ref={onRef}>
-                <ContentEditable placeholder={"Start typing ..."} />
+                <ContentEditable placeholder={readOnly ? "" : "Start typing ..."} />
               </div>
             </div>
           }

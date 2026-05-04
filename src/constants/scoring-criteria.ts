@@ -10,7 +10,7 @@ export interface ScoringCriterion {
 
 export const SCORING_CRITERIA: ScoringCriterion[] = [
   {
-    key: "winPoints",
+    key: "winPoint",
     title: "Win Point",
     description: "Base point awarded for a victory."
   },

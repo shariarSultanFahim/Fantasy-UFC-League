@@ -97,6 +97,11 @@ const data = {
           icon: FileText
         },
         {
+          title: "News Management",
+          url: "/admin/newsletter",
+          icon: FileText
+        },
+        {
           title: "Profile",
           url: "/admin/profile",
           icon: UserRoundPen

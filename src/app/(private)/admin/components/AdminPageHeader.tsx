@@ -8,25 +8,35 @@ interface AdminPageHeaderProps {
   subtitle: string;
   actionLabel?: string;
   actionHref?: string;
+  children?: React.ReactNode;
 }
 
-export function AdminPageHeader({ title, subtitle, actionLabel, actionHref }: AdminPageHeaderProps) {
+export function AdminPageHeader({ 
+  title, 
+  subtitle, 
+  actionLabel, 
+  actionHref,
+  children 
+}: AdminPageHeaderProps) {
   const hasAction = Boolean(actionLabel && actionHref);
 
   return (
-    <section className="flex flex-wrap items-start justify-between gap-4  ">
+    <section className="flex flex-wrap items-center justify-between gap-4 mb-8">
       <div className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">{title}</h1>
-        <p className="text-sm text-slate-600">{subtitle}</p>
+        <h1 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">{title}</h1>
+        <p className="text-sm font-medium text-slate-500 sm:text-base">{subtitle}</p>
       </div>
-      {hasAction ? (
-        <Button asChild size="lg">
-          <Link href={actionHref as string}>
-            <Plus className="size-4" />
-            {actionLabel}
-          </Link>
-        </Button>
-      ) : null}
+      <div className="flex items-center gap-3">
+        {hasAction && (
+          <Button asChild size="lg" className="rounded-full bg-[#3dbcf9] font-bold text-white hover:bg-[#3dbcf9]/90">
+            <Link href={actionHref as string}>
+              <Plus className="mr-2 size-4" />
+              {actionLabel}
+            </Link>
+          </Button>
+        )}
+        {children}
+      </div>
     </section>
   );
 }

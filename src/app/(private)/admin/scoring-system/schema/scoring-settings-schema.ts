@@ -10,7 +10,7 @@ const scoreField = z
   .max(SCORE_MAX, `Point value must be at most ${SCORE_MAX}.`);
 
 export const scoringSettingsSchema = z.object({
-  winPoints: scoreField,
+  winPoint: scoreField,
   finishBonus: scoreField,
   winningChampionshipBout: scoreField,
   championVsChampionWin: scoreField,

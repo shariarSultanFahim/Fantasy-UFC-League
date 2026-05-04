@@ -27,4 +27,5 @@ export type { ScoringSettings } from "./scoring";
 export type { IDivision, IDivisionFormValues } from "./division";
 export type { User, AuthRole, AuthSession, IApiResponse, IPaginatedResponse, ILoginResponse } from "./auth";
 export type { ILegalDocument, ILegalResponse, ILegalListResponse, LegalDocumentType } from "./legal";
-
+export * from "./newsletter";
+export * from "./scoring";

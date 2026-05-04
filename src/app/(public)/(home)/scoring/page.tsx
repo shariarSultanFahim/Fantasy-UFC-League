@@ -1,4 +1,9 @@
+"use client";
+
 import { SCORING_CRITERIA } from "@/constants/scoring-criteria";
+import { useScoringSettings } from "@/lib/actions/scoring";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Loader2 } from "lucide-react";
 
 import {
   Table,
@@ -9,20 +14,42 @@ import {
   TableRow
 } from "@/components/ui/table";
 
-import { DEFAULT_SCORING_SETTINGS } from "../../../../constants/scoring-settings";
-
-const scoringRows = SCORING_CRITERIA.map((criterion) => ({
-  action: criterion.title,
-  description: criterion.description,
-  points: DEFAULT_SCORING_SETTINGS[criterion.key]
-}));
-
 export default function ScoringPage() {
+  const { data: scoringData, isLoading } = useScoringSettings();
+
+  const settings = scoringData?.data;
+
+  const scoringRows = SCORING_CRITERIA.map((criterion) => ({
+    action: criterion.title,
+    description: criterion.description,
+    points: settings ? (settings[criterion.key as keyof typeof settings] as number) : 0,
+    key: criterion.key
+  }));
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-slate-50 px-4 py-10 text-primary sm:px-6 lg:px-8 lg:py-12">
+        <div className="mx-auto w-full max-w-6xl">
+          <section className="rounded-sm bg-[#0A192F] px-6 py-14 text-center text-white sm:px-10 lg:py-16">
+            <h1 className="text-5xl font-black tracking-tight sm:text-6xl">Scoring & Rules</h1>
+            <p className="mx-auto mt-5 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
+              Understand the point system used by the admin scoring settings.
+            </p>
+          </section>
+
+          <section className="mt-12 flex h-64 items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </section>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-10 text-primary sm:px-6 lg:px-8 lg:py-12">
       <div className="mx-auto w-full max-w-6xl">
         <section className="rounded-sm bg-[#0A192F] px-6 py-14 text-center text-white sm:px-10 lg:py-16">
-          <h1 className="text-5xl font-black tracking-tight sm:text-6xl">Scoring &amp; Rules</h1>
+          <h1 className="text-5xl font-black tracking-tight sm:text-6xl">Scoring & Rules</h1>
           <p className="mx-auto mt-5 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
             Understand the point system used by the admin scoring settings.
           </p>
@@ -48,7 +75,7 @@ export default function ScoringPage() {
               <TableBody>
                 {scoringRows.map((row, index) => (
                   <TableRow
-                    key={row.action}
+                    key={row.key}
                     className={index === scoringRows.length - 1 ? "bg-slate-50/70" : ""}
                   >
                     <TableCell className="px-6 py-4 text-base font-medium text-slate-800">
@@ -67,14 +94,16 @@ export default function ScoringPage() {
           </div>
         </section>
 
-        <section className="mt-10 rounded-xl border border-slate-200 bg-white px-6 py-5 text-sm text-slate-600 shadow-sm">
-          The current highlighted rare bonus is{" "}
-          <span className="font-semibold text-slate-900">Champion vs Champion Win</span>, set to{" "}
-          <span className="font-semibold text-emerald-600">
-            +{DEFAULT_SCORING_SETTINGS.championVsChampionWin}
-          </span>
-          .
-        </section>
+        {settings && (
+          <section className="mt-10 rounded-xl border border-slate-200 bg-white px-6 py-5 text-sm text-slate-600 shadow-sm">
+            The current highlighted rare bonus is{" "}
+            <span className="font-semibold text-slate-900">Champion vs Champion Win</span>, set to{" "}
+            <span className="font-semibold text-emerald-600">
+              +{settings.championVsChampionWin}
+            </span>
+            .
+          </section>
+        )}
       </div>
     </main>
   );

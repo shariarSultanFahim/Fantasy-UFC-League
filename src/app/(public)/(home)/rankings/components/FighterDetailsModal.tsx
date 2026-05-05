@@ -46,7 +46,7 @@ export function FighterDetailsModal({ fighter, isOpen, onClose }: FighterDetails
               <h2 className="mb-2 text-3xl font-bold text-slate-900">{fighter.name}</h2>
 
               <div className="mb-4 flex flex-wrap gap-3">
-                <Badge variant="secondary">{fighter.division}</Badge>
+                <Badge variant="secondary">{fighter.division?.name || fighter.divisionId}</Badge>
                 <Badge variant="outline">{fighter.nationality}</Badge>
                 <Badge variant="outline">Age {fighter.age}</Badge>
               </div>
@@ -124,8 +124,12 @@ export function FighterDetailsModal({ fighter, isOpen, onClose }: FighterDetails
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-bold text-emerald-600">
-                  {fighter.pointsChange > 0 ? "+" : ""}
-                  {fighter.pointsChange}%
+                  {fighter.pointsChange ? (
+                    <>
+                      {fighter.pointsChange > 0 ? "+" : ""}
+                      {fighter.pointsChange}%
+                    </>
+                  ) : "0%"}
                 </span>
               </div>
             </div>

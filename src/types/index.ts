@@ -15,7 +15,7 @@ export type {
   EventStatus
 } from "./event";
 export type { IFighter, IFighterFilters, IFighterResponse, Fighter, FighterFilters } from "./fighter";
-export type { League, LeagueStatus } from "./league";
+export type { ILeague, LeagueStatus } from "./league";
 export type {
   DraftPickItem,
   LeagueDraftStatus,

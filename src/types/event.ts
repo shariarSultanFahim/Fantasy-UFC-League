@@ -8,8 +8,8 @@ export interface EventFighterSnapshot {
   id: string;
   name: string;
   nickname: string;
-  avatarUrl: string;
-  division: string;
+  avatarUrl: string | null;
+  division?: string | { id: string; name: string };
 }
 
 export interface EventBout {

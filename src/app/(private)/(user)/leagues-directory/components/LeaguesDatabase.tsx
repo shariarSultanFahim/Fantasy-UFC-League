@@ -60,7 +60,7 @@ export function LeaguesDatabase() {
       code: league.code,
       name: league.name,
       hasPasscode: !league.isSystemGenerated && !!league.code, // Heuristic: system leagues are public
-      draftTime: new Date(league.draftTime).toLocaleString(),
+      draftTime: league.draftTime ? new Date(league.draftTime).toLocaleString() : "N/A",
       members: league.teams?.length || 0,
       memberLimit: league.memberLimit,
       actionLabel: isMyLeague ? "View" : "Join",

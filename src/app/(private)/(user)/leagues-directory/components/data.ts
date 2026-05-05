@@ -11,6 +11,7 @@ export const LEAGUE_LOBBY_DATA: LeagueLobbyEntry[] = [
   {
     id: "league-001",
     name: "Octagon Overlords",
+    code: "OVERLORDS",
     hasPasscode: true,
     passcode: "MMA2026",
     draftTime: "5:55 PM",
@@ -23,6 +24,7 @@ export const LEAGUE_LOBBY_DATA: LeagueLobbyEntry[] = [
   {
     id: "league-002",
     name: "The Submission Squad",
+    code: "SUBMIT",
     hasPasscode: false,
     draftTime: "5:55 PM",
     members: 0,
@@ -34,6 +36,7 @@ export const LEAGUE_LOBBY_DATA: LeagueLobbyEntry[] = [
   {
     id: "league-003",
     name: "Fight Night Elites",
+    code: "ELITES",
     hasPasscode: false,
     draftTime: "5:55 PM",
     members: 8,
@@ -45,6 +48,7 @@ export const LEAGUE_LOBBY_DATA: LeagueLobbyEntry[] = [
   {
     id: "league-004",
     name: "Gabriela's Gauntlet",
+    code: "GABBY",
     hasPasscode: false,
     draftTime: "5:55 PM",
     members: 0,
@@ -56,6 +60,7 @@ export const LEAGUE_LOBBY_DATA: LeagueLobbyEntry[] = [
   {
     id: "league-005",
     name: "Knockout Kings",
+    code: "KINGS",
     hasPasscode: false,
     draftTime: "5:55 PM",
     members: 0,
@@ -67,6 +72,7 @@ export const LEAGUE_LOBBY_DATA: LeagueLobbyEntry[] = [
   {
     id: "league-006",
     name: "Ultimate Warriors League",
+    code: "WARRIORS",
     hasPasscode: true,
     passcode: "MMA2026",
     draftTime: "5:55 PM",
@@ -79,6 +85,7 @@ export const LEAGUE_LOBBY_DATA: LeagueLobbyEntry[] = [
   {
     id: "league-007",
     name: "Cage Commanders",
+    code: "COMMAND",
     hasPasscode: true,
     passcode: "MMA2026",
     draftTime: "5:55 PM",
@@ -91,6 +98,7 @@ export const LEAGUE_LOBBY_DATA: LeagueLobbyEntry[] = [
   {
     id: "league-008",
     name: "Ground & Pound Masters",
+    code: "MASTERS",
     hasPasscode: true,
     passcode: "MMA2026",
     draftTime: "5:55 PM",

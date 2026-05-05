@@ -25,7 +25,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import type { Event, EventBoutFormValue } from "@/types";
 
-import { FIGHTERS_DATA } from "../../fighters/components/fighters-data";
+import { FIGHTERS_DATA } from "@/app/(public)/(home)/rankings/components/data";
 import { getEventFormSchema, type EventFormValues } from "../schema/event-form-schema";
 import { EventCombobox } from "./EventCombobox";
 import { EventPosterCropUploader } from "./EventPosterCropUploader";

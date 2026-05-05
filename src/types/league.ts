@@ -15,14 +15,17 @@ export interface ILeague {
   id: string;
   name: string;
   code: string;
-  managerId: string;
+  managerId?: string;
+  managerName: string;
+  managerAvatarUrl?: string;
+  memberCount: number;
   memberLimit: number;
-  rosterSize: number;
+  rosterSize?: number;
   status: LeagueStatus;
-  draftTime: string;
-  isSystemGenerated: boolean;
-  createdAt: string;
-  updatedAt: string;
+  draftTime?: string;
+  isSystemGenerated?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
   manager?: any; // User details
   teams?: ITeam[]; // Leaderboard
   scoringSettings?: IScoringSettings;

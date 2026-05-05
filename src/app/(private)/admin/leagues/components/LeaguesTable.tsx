@@ -16,28 +16,33 @@ import {
 } from "@/components/ui";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import type { League, LeagueStatus } from "@/types";
+import type { ILeague, LeagueStatus } from "@/types";
 
 interface LeaguesTableProps {
-  leagues: League[];
+  leagues: ILeague[];
 }
 
 const statusStyles: Record<LeagueStatus, string> = {
-  active: "bg-emerald-100 text-emerald-700",
-  drafting: "bg-amber-100 text-amber-700",
-  completed: "bg-slate-200 text-slate-700"
+  ACTIVE: "bg-emerald-100 text-emerald-700",
+  DRAFTING: "bg-amber-100 text-amber-700",
+  COMPLETED: "bg-slate-200 text-slate-700",
+  ARCHIVED: "bg-slate-100 text-slate-600"
 };
 
 function getStatusLabel(status: LeagueStatus) {
-  if (status === "active") {
+  if (status === "ACTIVE") {
     return "Active";
   }
 
-  if (status === "drafting") {
+  if (status === "DRAFTING") {
     return "Drafting";
   }
 
-  return "Completed";
+  if (status === "COMPLETED") {
+    return "Completed";
+  }
+
+  return "Archived";
 }
 
 function getMembersProgressClass(memberCount: number, memberLimit: number) {

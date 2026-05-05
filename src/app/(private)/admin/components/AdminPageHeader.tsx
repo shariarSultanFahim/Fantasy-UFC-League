@@ -11,12 +11,12 @@ interface AdminPageHeaderProps {
   children?: React.ReactNode;
 }
 
-export function AdminPageHeader({ 
-  title, 
-  subtitle, 
-  actionLabel, 
+export function AdminPageHeader({
+  title,
+  subtitle,
+  actionLabel,
   actionHref,
-  children 
+  children
 }: AdminPageHeaderProps) {
   const hasAction = Boolean(actionLabel && actionHref);
 
@@ -28,7 +28,7 @@ export function AdminPageHeader({
       </div>
       <div className="flex items-center gap-3">
         {hasAction && (
-          <Button asChild size="lg" className="rounded-full bg-[#3dbcf9] font-bold text-white hover:bg-[#3dbcf9]/90">
+          <Button asChild size="lg">
             <Link href={actionHref as string}>
               <Plus className="mr-2 size-4" />
               {actionLabel}

@@ -1,6 +1,6 @@
-import type { League } from "@/types";
+import type { ILeague } from "@/types";
 
-export const LEAGUES_DATA: League[] = [
+export const LEAGUES_DATA: ILeague[] = [
   {
     id: "88291",
     code: "UP",
@@ -9,7 +9,7 @@ export const LEAGUES_DATA: League[] = [
     managerAvatarUrl: "/demo.jpeg",
     memberCount: 10,
     memberLimit: 12,
-    status: "active"
+    status: "ACTIVE"
   },
   {
     id: "88295",
@@ -19,7 +19,7 @@ export const LEAGUES_DATA: League[] = [
     managerAvatarUrl: "/demo.jpeg",
     memberCount: 10,
     memberLimit: 10,
-    status: "drafting"
+    status: "DRAFTING"
   },
   {
     id: "88301",
@@ -29,7 +29,7 @@ export const LEAGUES_DATA: League[] = [
     managerAvatarUrl: "/demo.jpeg",
     memberCount: 12,
     memberLimit: 12,
-    status: "completed"
+    status: "COMPLETED"
   },
   {
     id: "88310",
@@ -39,7 +39,7 @@ export const LEAGUES_DATA: League[] = [
     managerAvatarUrl: "/demo.jpeg",
     memberCount: 10,
     memberLimit: 10,
-    status: "drafting"
+    status: "DRAFTING"
   },
   {
     id: "88318",
@@ -49,7 +49,7 @@ export const LEAGUES_DATA: League[] = [
     managerAvatarUrl: "/demo.jpeg",
     memberCount: 7,
     memberLimit: 12,
-    status: "active"
+    status: "ACTIVE"
   },
   {
     id: "88324",
@@ -59,7 +59,7 @@ export const LEAGUES_DATA: League[] = [
     managerAvatarUrl: "/demo.jpeg",
     memberCount: 12,
     memberLimit: 12,
-    status: "completed"
+    status: "COMPLETED"
   },
   {
     id: "88331",
@@ -69,7 +69,7 @@ export const LEAGUES_DATA: League[] = [
     managerAvatarUrl: "/demo.jpeg",
     memberCount: 5,
     memberLimit: 10,
-    status: "active"
+    status: "ACTIVE"
   },
   {
     id: "88337",
@@ -79,6 +79,6 @@ export const LEAGUES_DATA: League[] = [
     managerAvatarUrl: "/demo.jpeg",
     memberCount: 9,
     memberLimit: 10,
-    status: "drafting"
+    status: "DRAFTING"
   }
 ];

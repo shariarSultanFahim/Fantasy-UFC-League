@@ -199,11 +199,11 @@ export const LEAGUE_DRAFT_DETAILS: LeagueDraftDetails[] = [
 ];
 
 export function leagueStatusToDraftLifecycle(status: LeagueStatus): DraftLifecycleStatus {
-  if (status === "active") {
+  if (status === "ACTIVE") {
     return "pre_draft";
   }
 
-  if (status === "drafting") {
+  if (status === "DRAFTING") {
     return "drafting";
   }
 

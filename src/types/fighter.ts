@@ -11,18 +11,29 @@ export interface IFighter {
   losses: number;
   draws: number;
   avgL5: number;
-  bio: string | null;
+  bio?: string | null;
   avatarUrl: string | null;
   age: number | null;
   height: string | null;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
   divisionRank?: number;
   division?: {
     id: string;
     name: string;
   };
+  reach?: string;
+  koWins?: number;
+  submissionWins?: number;
+  decisionWins?: number;
+  titleDefenses?: number;
+  formerChampionDivisions?: string[];
+  upcomingOpponent?: string;
+  upcomingEvent?: string;
+  scheduledDate?: string;
+  pointsChange?: number;
+  lastFiveFightsAvgPoints?: number;
 }
 
 export interface IPaginationMeta {

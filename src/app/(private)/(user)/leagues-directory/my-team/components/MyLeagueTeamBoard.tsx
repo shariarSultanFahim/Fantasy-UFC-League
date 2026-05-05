@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 import type { LeagueFighter } from "@/types/league-simulation";
-import type { RankFilter, TeamFighterRow } from "@/types/my-team";
+import type { RankFilter, TeamFighterRow, LeaderboardRow } from "@/types/my-team";
 
 import { getLeagueLobbyMeta } from "@/helpers/league-lobby";
 
@@ -25,7 +25,7 @@ import { useLeague, useAvailableFighters, useAddFighter, useRemoveFighter } from
 import { useMe } from "@/lib/actions/auth";
 import { useDivisions } from "@/hooks/use-divisions";
 import { IFighter } from "@/types/fighter";
-import { ITeam, LeaderboardRow } from "@/types/league";
+import { ITeam } from "@/types/league";
 
 type LeagueTeamTab = "my-team" | "free-agents" | "leaderboard";
 

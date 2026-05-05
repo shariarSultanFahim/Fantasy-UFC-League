@@ -58,7 +58,7 @@ export const FIGHTERS_DATA: Fighter[] = [
     upcomingOpponent: "Dustin Poirier",
     upcomingEvent: "UFC 304",
     scheduledDate: "July 27, 2024",
-    lastFiveFightsAvgavgL5: 92.4,
+    lastFiveFightsAvgPoints: 92.4,
     pointsChange: 8,
     formerChampionDivisions: []
   },
@@ -85,7 +85,7 @@ export const FIGHTERS_DATA: Fighter[] = [
     upcomingOpponent: "Stipe Miocic",
     upcomingEvent: "UFC 309",
     scheduledDate: "November 16, 2024",
-    lastFiveFightsAvgavgL5: 88.2,
+    lastFiveFightsAvgPoints: 88.2,
     pointsChange: 5,
     formerChampionDivisions: ["Men's Light Heavyweight", "Men's Heavyweight"]
   },
@@ -112,7 +112,7 @@ export const FIGHTERS_DATA: Fighter[] = [
     upcomingOpponent: "Dricus du Plessis",
     upcomingEvent: "UFC 305",
     scheduledDate: "August 3, 2024",
-    lastFiveFightsAvgavgL5: 85.6,
+    lastFiveFightsAvgPoints: 85.6,
     pointsChange: 12,
     formerChampionDivisions: ["Men's Middleweight"]
   },
@@ -139,7 +139,7 @@ export const FIGHTERS_DATA: Fighter[] = [
     upcomingOpponent: "Sean Strickland",
     upcomingEvent: "UFC 293",
     scheduledDate: "September 9, 2023",
-    lastFiveFightsAvgavgL5: 79.3,
+    lastFiveFightsAvgPoints: 79.3,
     pointsChange: -2,
     formerChampionDivisions: ["Men's Middleweight"]
   },
@@ -166,7 +166,7 @@ export const FIGHTERS_DATA: Fighter[] = [
     upcomingOpponent: "Colby Covington",
     upcomingEvent: "UFC 295",
     scheduledDate: "November 11, 2023",
-    lastFiveFightsAvgavgL5: 82.1,
+    lastFiveFightsAvgPoints: 82.1,
     pointsChange: 6,
     formerChampionDivisions: ["Men's Welterweight"]
   },
@@ -193,7 +193,7 @@ export const FIGHTERS_DATA: Fighter[] = [
     upcomingOpponent: "TBA",
     upcomingEvent: "TBA",
     scheduledDate: "TBA",
-    lastFiveFightsAvgavgL5: 86.5,
+    lastFiveFightsAvgPoints: 86.5,
     pointsChange: -1,
     formerChampionDivisions: ["Men's Featherweight"]
   },
@@ -220,7 +220,7 @@ export const FIGHTERS_DATA: Fighter[] = [
     upcomingOpponent: "Alexander Volkanovski",
     upcomingEvent: "UFC 298",
     scheduledDate: "February 17, 2024",
-    lastFiveFightsAvgavgL5: 84.2,
+    lastFiveFightsAvgPoints: 84.2,
     pointsChange: 15,
     formerChampionDivisions: []
   },
@@ -247,7 +247,7 @@ export const FIGHTERS_DATA: Fighter[] = [
     upcomingOpponent: "Michael Chandler",
     upcomingEvent: "UFC 303",
     scheduledDate: "June 29, 2024",
-    lastFiveFightsAvgavgL5: 87.4,
+    lastFiveFightsAvgPoints: 87.4,
     pointsChange: 12,
     formerChampionDivisions: ["Men's Featherweight", "Men's Lightweight"]
   },
@@ -274,7 +274,7 @@ export const FIGHTERS_DATA: Fighter[] = [
     upcomingOpponent: "TBA",
     upcomingEvent: "TBA",
     scheduledDate: "TBA",
-    lastFiveFightsAvgavgL5: 75.8,
+    lastFiveFightsAvgPoints: 75.8,
     pointsChange: 3,
     formerChampionDivisions: []
   },
@@ -301,7 +301,7 @@ export const FIGHTERS_DATA: Fighter[] = [
     upcomingOpponent: "Retired",
     upcomingEvent: "N/A",
     scheduledDate: "N/A",
-    lastFiveFightsAvgavgL5: 91.2,
+    lastFiveFightsAvgPoints: 91.2,
     pointsChange: 0,
     formerChampionDivisions: ["Men's Lightweight"]
   }

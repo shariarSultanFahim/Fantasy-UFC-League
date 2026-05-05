@@ -23,9 +23,9 @@ const PAGE_SIZE = 10;
 
 const FILTER_OPTIONS: Array<{ label: string; value: "all" | LeagueStatus }> = [
   { label: "All", value: "all" },
-  { label: "Active", value: "active" },
-  { label: "Drafting", value: "drafting" },
-  { label: "Completed", value: "completed" }
+  { label: "Active", value: "ACTIVE" },
+  { label: "Drafting", value: "DRAFTING" },
+  { label: "Completed", value: "COMPLETED" }
 ];
 
 export function LeaguesDatabase() {

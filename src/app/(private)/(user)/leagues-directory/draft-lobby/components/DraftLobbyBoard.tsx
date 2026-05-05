@@ -64,9 +64,10 @@ export function DraftLobbyBoard() {
     if (!league?.draftTime) return;
 
     const calculateSecondsLeft = () => {
+      if (!league?.draftTime) return 0;
       const now = new Date().getTime();
-      const draftTime = new Date(league.draftTime).getTime();
-      const diff = Math.floor((draftTime - now) / 1000);
+      const draftTimeMs = new Date(league.draftTime).getTime();
+      const diff = Math.floor((draftTimeMs - now) / 1000);
       return diff > 0 ? diff : 0;
     };
 
@@ -79,7 +80,9 @@ export function DraftLobbyBoard() {
     return () => window.clearInterval(interval);
   }, [league?.draftTime]);
 
-  const isDraftRoomOpen = league?.status === "DRAFTING" || (league?.draftTime && new Date(league.draftTime).getTime() <= new Date().getTime());
+  const draftTimeMs = league?.draftTime ? new Date(league.draftTime).getTime() : 0;
+  const isDraftRoomOpen =
+    league?.status === "DRAFTING" || (draftTimeMs > 0 && draftTimeMs <= new Date().getTime());
 
   const teamRows = useMemo(() => {
     const joinedTeams = league?.teams || [];

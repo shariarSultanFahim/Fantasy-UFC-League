@@ -1,4 +1,4 @@
-import { FIGHTERS_DATA } from "../../fighters/components/fighters-data";
+import { FIGHTERS_DATA } from "@/app/(public)/(home)/rankings/components/data";
 
 import type { Event, EventBout, EventStatus, Fighter } from "@/types";
 

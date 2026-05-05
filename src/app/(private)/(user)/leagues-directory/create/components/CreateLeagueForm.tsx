@@ -7,6 +7,10 @@ import { useRouter } from "next/navigation";
 import { Copy, Share2, Trophy } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
+import { toast } from "sonner";
+
+import { useCreateLeague } from "@/lib/actions/league";
+import { IScoringSettings } from "@/types/league";
 
 import {
   joinLeagueLobby,
@@ -69,6 +73,8 @@ function toLeagueSlug(leagueName: string) {
 
 export function CreateLeagueForm() {
   const router = useRouter();
+  const { mutate: createLeague, isPending: isCreating } = useCreateLeague();
+
   const form = useForm<CreateLeagueFormValues>({
     resolver: zodResolver(createLeagueFormSchema),
     defaultValues
@@ -102,25 +108,46 @@ export function CreateLeagueForm() {
   };
 
   const onSubmit = (values: CreateLeagueFormValues) => {
-    const leagueId = toLeagueSlug(values.leagueName) || "league-custom";
-
-    upsertLeagueLobbyMeta({
-      id: leagueId,
-      name: values.leagueName,
-      memberLimit: Number(values.leagueSize)
-    });
-    setLeagueDraftStatus(leagueId, "waiting");
-    joinLeagueLobby(leagueId);
+    // Combine date and time into a single ISO string
+    const draftDateTime = new Date(`${values.draftDate}T${values.draftTime}:00Z`).toISOString();
 
     const payload = {
-      ...values,
-      leagueId,
-      inviteCode: INVITE_CODE,
-      shareLink
+      name: values.leagueName,
+      leagueType: values.leagueType.toUpperCase(),
+      memberLimit: Number(values.leagueSize),
+      rosterSize: 5, // Default roster size
+      draftTime: draftDateTime,
+      secondsPerPick: Number(values.pickTimeLimit),
+      passcode: values.passcode || undefined,
+      scoringSettings: {
+        winPoints: 10,
+        finishBonus: 5,
+        winningChampionshipBout: 5,
+        championVsChampionWin: 5,
+        winningAgainstRankedOpponent: 2,
+        winningFiveRoundFight: 3,
+      } as IScoringSettings,
     };
 
-    void payload;
-    router.push(`/leagues-directory/draft-lobby?leagueId=${leagueId}`);
+    createLeague(payload, {
+      onSuccess: (res) => {
+        const leagueId = res.data.id;
+        
+        upsertLeagueLobbyMeta({
+          id: leagueId,
+          name: res.data.name,
+          memberLimit: res.data.memberLimit
+        });
+        setLeagueDraftStatus(leagueId, "waiting");
+        joinLeagueLobby(leagueId);
+
+        toast.success("League created successfully!");
+        router.push(`/leagues-directory/draft-lobby?leagueId=${leagueId}`);
+      },
+      onError: (err: any) => {
+        toast.error(err?.response?.data?.message || "Failed to create league.");
+      }
+    });
   };
 
   return (
@@ -355,8 +382,8 @@ export function CreateLeagueForm() {
               <Button type="button" variant="ghost" asChild>
                 <Link href="/leagues-directory">Cancel</Link>
               </Button>
-              <Button type="submit" className="bg-[#0E2A57] hover:bg-[#12336b]">
-                Create League
+              <Button type="submit" className="bg-[#0E2A57] hover:bg-[#12336b]" disabled={isCreating}>
+                {isCreating ? "Creating..." : "Create League"}
               </Button>
             </div>
           </form>

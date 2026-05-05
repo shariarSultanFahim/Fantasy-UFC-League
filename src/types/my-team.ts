@@ -15,6 +15,7 @@ export interface TeamFighterRow {
 }
 
 export interface LeaderboardRow {
+  teamId: string;
   rank: number;
   teamName: string;
   iconClassName: string;

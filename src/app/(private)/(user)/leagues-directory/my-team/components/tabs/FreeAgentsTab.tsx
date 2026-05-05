@@ -146,9 +146,7 @@ export function FreeAgentsTab({
                   </TableCell>
                   <TableCell className="py-4 font-medium text-blue-600">{fighter.name}</TableCell>
                   <TableCell className="py-4 text-slate-700">{fighter.weightClass}</TableCell>
-                  <TableCell className="py-4 text-slate-700">
-                    {fighter.wins}-{fighter.losses}
-                  </TableCell>
+                  <TableCell className="py-4 text-slate-700">{fighter.wins}</TableCell>
                   <TableCell className="py-4 text-slate-700">{fighter.losses}</TableCell>
                   <TableCell className="py-4 text-slate-700">{fighter.divisionRank}</TableCell>
                   <TableCell className="py-4 font-semibold text-[#1C3D87]">

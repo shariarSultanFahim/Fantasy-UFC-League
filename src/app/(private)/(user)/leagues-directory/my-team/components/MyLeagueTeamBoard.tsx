@@ -21,14 +21,20 @@ import { FreeAgentsTab } from "./tabs/FreeAgentsTab";
 import { LeaderboardTab } from "./tabs/LeaderboardTab";
 import { MyTeamTab } from "./tabs/MyTeamTab";
 
+import { useLeague, useAvailableFighters, useAddFighter, useRemoveFighter } from "@/lib/actions/league";
+import { useMe } from "@/lib/actions/auth";
+import { useDivisions } from "@/hooks/use-divisions";
+import { IFighter } from "@/types/fighter";
+import { ITeam, LeaderboardRow } from "@/types/league";
+
 type LeagueTeamTab = "my-team" | "free-agents" | "leaderboard";
 
 function decimalToPointString(value: number) {
   return value.toFixed(3).replace("0.", ".");
 }
 
-function mapFighterToTeamRow(fighter: LeagueFighter): TeamFighterRow {
-  const championship = fighter.divisionRank <= 3 ? 1 : 0;
+function mapFighterToTeamRow(fighter: IFighter): TeamFighterRow {
+  const championship = (fighter.rank && fighter.rank <= 3) ? 1 : 0;
   const finishWins = Math.max(1, Math.floor(fighter.wins * 0.4));
   const regularWins = Math.max(0, fighter.wins - finishWins);
   const fin = Math.max(0, finishWins - 1);
@@ -37,108 +43,126 @@ function mapFighterToTeamRow(fighter: LeagueFighter): TeamFighterRow {
   return {
     id: fighter.id,
     fighterName: fighter.name,
-    weightClass: fighter.weightClass,
-    avatarUrl: fighter.avatarUrl,
+    weightClass: fighter.division?.name || "Unknown",
+    avatarUrl: fighter.avatarUrl || "/fighter-placeholder.png",
     championship,
     wins: fighter.wins,
     fiveRw: finishWins,
     rw: regularWins,
     fin,
     cc,
-    totalPoints: decimalToPointString(fighter.avgPoints / 100)
+    totalPoints: (fighter.avgL5 / 10).toFixed(1)
+  };
+}
+
+function mapFighterToLeagueFighter(fighter: IFighter): LeagueFighter {
+  return {
+    id: fighter.id,
+    name: fighter.name,
+    weightClass: fighter.division?.name || "Unknown",
+    nationality: fighter.nationality,
+    wins: fighter.wins,
+    losses: fighter.losses,
+    avgPoints: fighter.avgL5,
+    divisionRank: fighter.rank || 0,
+    avatarUrl: fighter.avatarUrl || "/fighter-placeholder.png"
   };
 }
 
 export function MyLeagueTeamBoard() {
   const searchParams = useSearchParams();
   const leagueId = searchParams.get("leagueId") ?? "league-001";
-  const leagueMeta = useMemo(() => getLeagueLobbyMeta(leagueId), [leagueId]);
-
+  
+  const { data: leagueResponse, isLoading: isLoadingLeague } = useLeague(leagueId);
+  const { data: userResponse } = useMe();
+  const { divisions } = useDivisions();
+  
   const [activeTab, setActiveTab] = useState<LeagueTeamTab>("my-team");
   const [freeAgentSearch, setFreeAgentSearch] = useState("");
   const [divisionFilter, setDivisionFilter] = useState("all");
   const [nationalityFilter, setNationalityFilter] = useState("all");
   const [rankFilter, setRankFilter] = useState<RankFilter>("all");
 
-  const teamFighters = useMemo(() => LEAGUE_FIGHTERS.slice(0, 5), []);
-  const initialTeamRows = useMemo(() => {
-    return teamFighters.map((fighter) => mapFighterToTeamRow(fighter));
-  }, [teamFighters]);
+  const { data: availableFightersResponse, isLoading: isLoadingFighters } = useAvailableFighters(leagueId, {
+    searchTerm: freeAgentSearch,
+    divisionId: divisionFilter === "all" ? undefined : divisionFilter,
+    page: 1,
+    limit: 100,
+  });
 
-  const [teamRows, setTeamRows] = useState<TeamFighterRow[]>(initialTeamRows);
+  const { mutate: addFighter, isPending: isAdding } = useAddFighter(leagueId);
+  const { mutate: removeFighter, isPending: isRemoving } = useRemoveFighter(leagueId);
+
+  const league = leagueResponse?.data;
+  const user = userResponse?.data;
+  const myTeam = useMemo(() => {
+    if (!league?.teams || !user) return null;
+    return league.teams.find(t => t.ownerId === user.id);
+  }, [league, user]);
+
   const [fighterToRemove, setFighterToRemove] = useState<TeamFighterRow | null>(null);
   const [fighterToAdd, setFighterToAdd] = useState<LeagueFighter | null>(null);
 
-  const rosterFighterIdSet = useMemo(() => {
-    return new Set(teamRows.map((fighter) => fighter.id));
-  }, [teamRows]);
-
-  const divisionOptions = useMemo(() => {
-    return [
-      "all",
-      ...Array.from(new Set(LEAGUE_FIGHTERS.map((fighter) => fighter.weightClass))).sort()
-    ];
-  }, []);
-
-  const nationalityOptions = useMemo(() => {
-    return [
-      "all",
-      ...Array.from(new Set(LEAGUE_FIGHTERS.map((fighter) => fighter.nationality))).sort()
-    ];
-  }, []);
+  const teamRows = useMemo(() => {
+    if (!myTeam?.fighters) return [];
+    return myTeam.fighters.map(mapFighterToTeamRow);
+  }, [myTeam]);
 
   const freeAgents = useMemo(() => {
-    return LEAGUE_FIGHTERS.filter((fighter) => {
-      if (rosterFighterIdSet.has(fighter.id)) {
-        return false;
-      }
+    const fighters = (availableFightersResponse?.data?.data || []) as IFighter[];
+    return fighters.map(mapFighterToLeagueFighter);
+  }, [availableFightersResponse]);
 
-      const matchesSearch = fighter.name.toLowerCase().includes(freeAgentSearch.toLowerCase());
-      const matchesDivision = divisionFilter === "all" || fighter.weightClass === divisionFilter;
-      const matchesNationality =
-        nationalityFilter === "all" || fighter.nationality === nationalityFilter;
-      const matchesRank =
-        rankFilter === "all" ||
-        (rankFilter === "top-3" && fighter.divisionRank <= 3) ||
-        (rankFilter === "top-5" && fighter.divisionRank <= 5);
+  const leaderboardRows = useMemo<any[]>(() => {
+    if (!league?.teams) return [];
+    // Sort teams by points for leaderboard
+    const sortedTeams = [...league.teams].sort((a, b) => (b.totalPoints || 0) - (a.totalPoints || 0));
+    
+    return sortedTeams.map((team, index) => {
+      const topTeamPoints = sortedTeams[0].totalPoints || 0;
+      const ptsBack = index === 0 ? 0 : topTeamPoints - (team.totalPoints || 0);
 
-      return matchesSearch && matchesDivision && matchesNationality && matchesRank;
+      return {
+        teamId: team.id,
+        rank: index + 1,
+        teamName: team.name,
+        iconClassName: "bg-indigo-600",
+        iconGlyph: team.name.charAt(0).toUpperCase(),
+        totals: {
+          r: 0, hr: 0, rbi: 0, sb: 0, avg: 0, k: 0, w: 0, sv: 0, hd: 0, era: 0, whip: 0,
+          tot: team.totalPoints || 0,
+          chg: 0
+        }
+      };
     });
-  }, [divisionFilter, freeAgentSearch, nationalityFilter, rankFilter, rosterFighterIdSet]);
+  }, [league]);
 
   const handleConfirmRemove = () => {
-    if (!fighterToRemove) {
-      return;
-    }
-
-    setTeamRows((previousRows) => {
-      return previousRows.filter((fighter) => fighter.id !== fighterToRemove.id);
+    if (!fighterToRemove) return;
+    removeFighter({ fighterId: fighterToRemove.id }, {
+      onSuccess: () => setFighterToRemove(null)
     });
-    setFighterToRemove(null);
   };
 
   const handleConfirmAdd = () => {
-    if (!fighterToAdd) {
-      return;
-    }
-
-    setTeamRows((previousRows) => {
-      if (previousRows.some((fighter) => fighter.id === fighterToAdd.id)) {
-        return previousRows;
+    if (!fighterToAdd) return;
+    addFighter({ fighterId: fighterToAdd.id }, {
+      onSuccess: () => {
+        setFighterToAdd(null);
+        setActiveTab("my-team");
       }
-
-      return [...previousRows, mapFighterToTeamRow(fighterToAdd)];
     });
-
-    setFighterToAdd(null);
-    setActiveTab("my-team");
   };
+
+  if (isLoadingLeague) {
+    return <div className="flex h-64 items-center justify-center">Loading league data...</div>;
+  }
 
   return (
     <section className="space-y-6">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-          {leagueMeta?.name ?? "My League Team"}
+          {league?.name ?? "My League Team"}
         </h1>
         <Button asChild variant="outline" className="bg-white">
           <Link href="/leagues-directory">Back to Leagues</Link>
@@ -174,13 +198,13 @@ export function MyLeagueTeamBoard() {
 
         <TabsContent value="free-agents" className="mt-6">
           <FreeAgentsTab
-            leagueName={leagueMeta?.name ?? "MMA League #23"}
+            leagueName={league?.name ?? "MMA League"}
             freeAgentSearch={freeAgentSearch}
             divisionFilter={divisionFilter}
             nationalityFilter={nationalityFilter}
             rankFilter={rankFilter}
-            divisionOptions={divisionOptions}
-            nationalityOptions={nationalityOptions}
+            divisionOptions={["all", ...(divisions?.map(d => d.name) || [])]}
+            nationalityOptions={["all"]}
             freeAgents={freeAgents}
             onSearchChange={setFreeAgentSearch}
             onDivisionChange={setDivisionFilter}
@@ -191,7 +215,7 @@ export function MyLeagueTeamBoard() {
         </TabsContent>
 
         <TabsContent value="leaderboard" className="mt-6">
-          <LeaderboardTab leagueId={leagueId} leaderboardRows={LEADERBOARD_ROWS} />
+          <LeaderboardTab leagueId={leagueId} leaderboardRows={leaderboardRows} />
         </TabsContent>
       </Tabs>
 

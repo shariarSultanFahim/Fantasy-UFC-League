@@ -9,7 +9,9 @@ import { toast } from "sonner";
 import type { LeagueFighter } from "@/types/league-simulation";
 import type { TeamStatRow } from "@/types/team-details";
 
-import { LEAGUE_FIGHTERS } from "@/data/league-fighters";
+import { useLeague } from "@/lib/actions/league";
+import { useMe } from "@/lib/actions/auth";
+import { IFighter } from "@/types/fighter";
 
 import { Button, Card } from "@/components/ui";
 import {
@@ -31,8 +33,8 @@ function formatTeamTitle(teamName: string) {
   return `${teamName} Team`;
 }
 
-function mapToTeamRow(fighter: LeagueFighter): TeamStatRow {
-  const championships = fighter.divisionRank <= 3 ? 1 : 0;
+function mapToTeamRow(fighter: IFighter): TeamStatRow {
+  const championships = (fighter.rank && fighter.rank <= 3) ? 1 : 0;
   const fiveRw = Math.max(1, Math.floor(fighter.wins * 0.4));
   const rw = Math.max(0, fighter.wins - fiveRw);
   const fin = Math.max(0, fiveRw - 1);
@@ -40,93 +42,53 @@ function mapToTeamRow(fighter: LeagueFighter): TeamStatRow {
   return {
     id: fighter.id,
     fighterName: fighter.name,
-    weightClass: fighter.weightClass,
+    weightClass: fighter.division?.name || "Unknown",
     championships,
     wins: fighter.wins,
     fiveRw,
     rw,
     fin,
     cc: championships,
-    totalPoints: (fighter.avgPoints / 100).toFixed(3).replace("0.", ".")
+    totalPoints: (fighter.avgL5 / 10).toFixed(1)
   };
 }
 
 export function TeamDetailsBoard() {
   const searchParams = useSearchParams();
+  const leagueId = searchParams.get("leagueId") ?? "";
+  const teamId = searchParams.get("teamId") ?? "";
   const teamName = searchParams.get("team") ?? "Opposing Team";
+
+  const { data: leagueResponse, isLoading } = useLeague(leagueId);
+  const { data: userResponse } = useMe();
+
   const [searchFighter, setSearchFighter] = useState("");
   const [ownerMessage, setOwnerMessage] = useState("");
   const [targetFighter, setTargetFighter] = useState<TeamStatRow | null>(null);
   const [selectedYourFighterId, setSelectedYourFighterId] = useState<string>("");
 
+  const league = leagueResponse?.data;
+  const currentUser = userResponse?.data;
+
+  const opposingTeam = useMemo(() => {
+    if (!league?.teams) return null;
+    return league.teams.find(t => t.id === teamId || t.name === teamName);
+  }, [league, teamId, teamName]);
+
   const opposingTeamFighters = useMemo(() => {
-    return [
-      {
-        id: "opp-01",
-        fighterName: "Islam Makhachev",
-        weightClass: "Lightweight",
-        championships: 2,
-        wins: 1,
-        fiveRw: 1,
-        rw: 2,
-        fin: 1,
-        cc: 0,
-        totalPoints: ".285"
-      },
-      {
-        id: "opp-02",
-        fighterName: "Ilia Topuria",
-        weightClass: "Featherweight",
-        championships: 1,
-        wins: 3,
-        fiveRw: 2,
-        rw: 2,
-        fin: 1,
-        cc: 0,
-        totalPoints: ".322"
-      },
-      {
-        id: "opp-03",
-        fighterName: "Khamzat Chimaev",
-        weightClass: "Middleweight",
-        championships: 0,
-        wins: 1,
-        fiveRw: 2,
-        rw: 0,
-        fin: 1,
-        cc: 1,
-        totalPoints: ".298"
-      },
-      {
-        id: "opp-04",
-        fighterName: "Alex Pereira",
-        weightClass: "Light Heavyweight",
-        championships: 3,
-        wins: 2,
-        fiveRw: 1,
-        rw: 1,
-        fin: 1,
-        cc: 0,
-        totalPoints: ".273"
-      },
-      {
-        id: "opp-05",
-        fighterName: "Petr Yan",
-        weightClass: "Bantamweight",
-        championships: 0,
-        wins: 1,
-        fiveRw: 0,
-        rw: 2,
-        fin: 1,
-        cc: 1,
-        totalPoints: ".337"
-      }
-    ] satisfies TeamStatRow[];
-  }, []);
+    if (!opposingTeam?.fighters) return [];
+    return opposingTeam.fighters.map(mapToTeamRow);
+  }, [opposingTeam]);
+
+  const myTeam = useMemo(() => {
+    if (!league?.teams || !currentUser) return null;
+    return league.teams.find(t => t.ownerId === currentUser.id);
+  }, [league, currentUser]);
 
   const yourFighters = useMemo(() => {
-    return LEAGUE_FIGHTERS.slice(0, 6).map((fighter) => mapToTeamRow(fighter));
-  }, []);
+    if (!myTeam?.fighters) return [];
+    return myTeam.fighters.map(mapToTeamRow);
+  }, [myTeam]);
 
   const selectedYourFighter = useMemo(() => {
     return yourFighters.find((fighter) => fighter.id === selectedYourFighterId) ?? null;
@@ -143,14 +105,20 @@ export function TeamDetailsBoard() {
       return;
     }
 
-    setTargetFighter(null);
-    setSelectedYourFighterId("");
-    setOwnerMessage("");
-
+    // This would typically call a useProposeTrade mutation
     toast.success("Trade offer sent successfully!", {
       position: "top-center"
     });
+
+    setTargetFighter(null);
+    setSelectedYourFighterId("");
+    setOwnerMessage("");
   };
+
+  if (isLoading) {
+    return <div className="flex h-64 items-center justify-center">Loading team details...</div>;
+  }
+
 
   return (
     <section className="space-y-6">

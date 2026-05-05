@@ -2,16 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-
-import {
-  getCurrentLoggedInUserName,
-  getJoinedLeagueMembers,
-  getLeagueDraftStatus,
-  getLeagueLobbyMeta,
-  setLeagueDraftStatus
-} from "@/helpers/league-lobby";
+import { useLeague } from "@/lib/actions/league";
+import { useMe } from "@/lib/actions/auth";
 
 import { Button, Card } from "@/components/ui";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface TeamRow {
   teamName: string;
@@ -32,42 +27,17 @@ const DOT_COLORS = [
   "bg-slate-600"
 ];
 
-const TEAM_SUFFIXES = [
-  "Magnificent Team",
-  "Great Team",
-  "Aces",
-  "Dominators",
-  "Sluggers",
-  "Bombers",
-  "Champions",
-  "Ninjas",
-  "Juggernauts",
-  "Warriors"
-];
-
-const LOBBY_WAIT_SECONDS = 5 * 60;
-
-function getInitials(words: string[]) {
-  return words
+function getInitials(name: string) {
+  return name
+    .split(/\s+/)
     .slice(0, 3)
     .map((word) => word[0]?.toUpperCase() ?? "")
     .join("");
 }
 
-function getTeamRow(memberName: string, index: number): TeamRow {
-  const primaryName = memberName.trim().split(/\s+/)[0] ?? memberName;
-  const suffix = TEAM_SUFFIXES[index % TEAM_SUFFIXES.length];
-  const teamName = `${primaryName}'s ${suffix}`;
-  const abbr = getInitials([primaryName, ...suffix.split(" ")]);
-
-  return {
-    teamName,
-    abbr,
-    dotClassName: DOT_COLORS[index % DOT_COLORS.length] ?? "bg-slate-500"
-  };
-}
-
 function formatTimer(totalSeconds: number) {
+  if (totalSeconds <= 0) return "00:00:00:00";
+
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
@@ -78,65 +48,77 @@ function formatTimer(totalSeconds: number) {
 export function DraftLobbyBoard() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const leagueId = searchParams.get("leagueId") ?? "league-023";
+  const leagueId = searchParams.get("leagueId");
 
-  const [secondsLeft, setSecondsLeft] = useState(() =>
-    getLeagueDraftStatus(leagueId) === "waiting" ? LOBBY_WAIT_SECONDS : 0
-  );
-  const currentUserName = getCurrentLoggedInUserName();
+  const { data: leagueData, isLoading: isLoadingLeague } = useLeague(leagueId || "");
+  const { data: userData } = useMe();
+  const currentUserId = userData?.data?.id;
+
+  const league = leagueData?.data;
+  const leagueName = league?.name ?? "MMA League";
+  const memberLimit = league?.memberLimit ?? 10;
+
+  const [secondsLeft, setSecondsLeft] = useState(0);
 
   useEffect(() => {
+    if (!league?.draftTime) return;
+
+    const calculateSecondsLeft = () => {
+      const now = new Date().getTime();
+      const draftTime = new Date(league.draftTime).getTime();
+      const diff = Math.floor((draftTime - now) / 1000);
+      return diff > 0 ? diff : 0;
+    };
+
+    setSecondsLeft(calculateSecondsLeft());
+
     const interval = window.setInterval(() => {
-      setSecondsLeft((previous) => {
-        const draftStatus = getLeagueDraftStatus(leagueId);
-
-        if (draftStatus !== "waiting") {
-          return 0;
-        }
-
-        if (previous > 1) {
-          return previous - 1;
-        }
-
-        const lobbyMeta = getLeagueLobbyMeta(leagueId);
-        const memberLimit = lobbyMeta?.memberLimit ?? 10;
-        const memberCount = getJoinedLeagueMembers(leagueId).length;
-
-        if (memberCount < memberLimit) {
-          return LOBBY_WAIT_SECONDS;
-        }
-
-        setLeagueDraftStatus(leagueId, "open");
-
-        return 0;
-      });
+      setSecondsLeft(calculateSecondsLeft());
     }, 1000);
 
-    return () => {
-      window.clearInterval(interval);
-    };
-  }, [leagueId]);
+    return () => window.clearInterval(interval);
+  }, [league?.draftTime]);
 
-  const leagueMeta = useMemo(() => getLeagueLobbyMeta(leagueId), [leagueId]);
-  const leagueName = leagueMeta?.name ?? "MMA League #23";
-  const memberLimit = leagueMeta?.memberLimit ?? 10;
-  const draftStatus = getLeagueDraftStatus(leagueId);
-  const isDraftRoomOpen = draftStatus === "open" || draftStatus === "drafting";
-  const joinedNames = getJoinedLeagueMembers(leagueId).map((member) => member.name);
+  const isDraftRoomOpen = league?.status === "DRAFTING" || (league?.draftTime && new Date(league.draftTime).getTime() <= new Date().getTime());
 
   const teamRows = useMemo(() => {
-    const rows: TeamRow[] = joinedNames.map((name, index) => getTeamRow(name, index));
+    const joinedTeams = league?.teams || [];
+    const rows: TeamRow[] = joinedTeams.map((team, index) => ({
+      teamName: team.name,
+      abbr: getInitials(team.name),
+      dotClassName: DOT_COLORS[index % DOT_COLORS.length] ?? "bg-slate-500",
+      ownerId: team.ownerId
+    })) as (TeamRow & { ownerId: string })[];
 
-    for (let index = rows.length; index < memberLimit; index += 1) {
+    const remainingSlots = memberLimit - rows.length;
+    for (let index = 0; index < remainingSlots; index += 1) {
       rows.push({
-        teamName: `Waiting for Manager ${index + 1}`,
+        teamName: `Waiting for Manager ${rows.length + 1}`,
         abbr: "---",
-        dotClassName: "bg-slate-300"
-      });
+        dotClassName: "bg-slate-300",
+        ownerId: ""
+      } as any);
     }
 
-    return rows.slice(0, memberLimit);
-  }, [joinedNames, memberLimit]);
+    return rows;
+  }, [league?.teams, memberLimit]);
+
+  if (!leagueId) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <p className="text-slate-500">No league ID provided.</p>
+      </div>
+    );
+  }
+
+  if (isLoadingLeague) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-12 w-1/2" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    );
+  }
 
   return (
     <section className="space-y-6">
@@ -145,7 +127,7 @@ export function DraftLobbyBoard() {
           {leagueName} Waiting Room
         </h1>
         <p className="max-w-3xl text-sm text-slate-600">
-          This is a private league with custom settings. The draft will begin at the scheduled time.
+          This is a {league?.isSystemGenerated ? "public" : "private"} league with custom settings. The draft will begin at the scheduled time.
           Make sure to review your pre-draft rankings and be ready when the timer reaches zero.
         </p>
       </div>
@@ -153,21 +135,20 @@ export function DraftLobbyBoard() {
       <Card className="border border-slate-200 bg-slate-100 p-6 sm:p-8">
         <div className="relative rounded-md border border-slate-200 bg-[#F3F4F6] px-4 py-7 text-center">
           {isDraftRoomOpen ? (
-            <>
-              <p className="text-4xl font-medium text-[#0E2A57]">The Draft room is now open!</p>
+            <div className="flex flex-col items-center justify-center gap-4 py-4">
+              <p className="text-2xl font-medium text-[#0E2A57] sm:text-4xl">The Draft room is now open!</p>
               <Button
                 type="button"
-                className="absolute top-1/2 right-4 h-10 -translate-y-1/2 rounded-sm bg-[#0E2A57] px-8 text-base hover:bg-[#12336b]"
+                className="h-10 rounded-sm bg-[#0E2A57] px-8 text-base hover:bg-[#12336b]"
                 onClick={() => {
-                  setLeagueDraftStatus(leagueId, "drafting");
                   router.push(`/leagues-directory/snake-draft?leagueId=${leagueId}`);
                 }}
               >
                 Enter The Draft
               </Button>
-            </>
+            </div>
           ) : (
-            <div className="flex flex-col justify-between gap-2 md:flex-row">
+            <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
               <p className="flex-1 font-mono text-4xl font-black text-slate-900 sm:text-6xl md:text-5xl">
                 {formatTimer(secondsLeft)}
               </p>
@@ -206,7 +187,7 @@ export function DraftLobbyBoard() {
               </tr>
             </thead>
             <tbody>
-              {teamRows.map((row, index) => (
+              {teamRows.map((row: any, index) => (
                 <tr
                   key={`${row.teamName}-${index}`}
                   className={index % 2 === 0 ? "bg-[#F3F4F6]" : "bg-[#E5E7EB]"}
@@ -219,7 +200,7 @@ export function DraftLobbyBoard() {
                         {row.abbr === "---" ? "-" : row.abbr[0]}
                       </span>
                       <span>{row.teamName}</span>
-                      {row.teamName.startsWith(`${currentUserName}'s`) ? (
+                      {row.ownerId === currentUserId ? (
                         <button
                           type="button"
                           className="text-xs text-blue-600 hover:text-blue-700"

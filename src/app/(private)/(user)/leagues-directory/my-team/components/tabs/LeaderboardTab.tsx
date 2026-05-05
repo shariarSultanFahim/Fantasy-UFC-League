@@ -129,7 +129,7 @@ export function LeaderboardTab({ leagueId, leaderboardRows }: LeaderboardTabProp
                           {row.iconGlyph}
                         </span>
                         <Link
-                          href={`/leagues-directory/team-details?leagueId=${leagueId}&team=${encodeURIComponent(row.teamName)}`}
+                          href={`/leagues-directory/team-details?leagueId=${leagueId}&teamId=${row.teamId}&team=${encodeURIComponent(row.teamName)}`}
                           className="text-slate-900 hover:text-blue-700"
                         >
                           {row.teamName}

@@ -4,12 +4,13 @@ import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-import type { LeagueLobbyEntry } from "@/types/league";
+import type { ILeague, LeagueLobbyEntry, LeagueStatus } from "@/types/league";
+import { useLeagues, useMyLeagues, useQuickJoin, useJoinLeague } from "@/lib/actions/league";
+import { useMe } from "@/lib/actions/auth";
 
 import {
-  getCurrentLoggedInUserName,
-  getJoinedLeagueMembers,
   joinLeagueLobby,
   setLeagueDraftStatus,
   upsertLeagueLobbyMeta
@@ -20,85 +21,70 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { LEAGUE_LOBBY_DATA } from "./data";
 import { LeaguesPagination } from "./LeaguesPagination";
 import { LeaguesTable } from "./LeaguesTable";
 
 const LEAGUES_PER_PAGE = 8;
-const INSTANT_LEAGUE_ID = "instant-league";
-const INSTANT_LEAGUE_NAME = "Instant League";
-const INSTANT_LEAGUE_MEMBER_LIMIT = 10;
 type LeaguesDirectoryView = "all" | "my";
 
 export function LeaguesDatabase() {
   const router = useRouter();
   const [page, setPage] = React.useState(1);
   const [activeView, setActiveView] = React.useState<LeaguesDirectoryView>("all");
-  const [myLeagueIds, setMyLeagueIds] = React.useState<string[]>([]);
   const [selectedLeague, setSelectedLeague] = React.useState<LeagueLobbyEntry | null>(null);
   const [enteredPasscode, setEnteredPasscode] = React.useState("");
   const [passcodeError, setPasscodeError] = React.useState("");
 
-  const allLeagues = LEAGUE_LOBBY_DATA;
-  const refreshMyLeagues = React.useCallback(() => {
-    const currentUserName = getCurrentLoggedInUserName().toLowerCase();
+  const { data: allLeaguesData, isLoading: isLoadingAll } = useLeagues({
+    page,
+    limit: LEAGUES_PER_PAGE,
+  });
 
-    const joinedLeagueIds = allLeagues
-      .filter((league) =>
-        getJoinedLeagueMembers(league.id).some(
-          (member) => member.name.toLowerCase() === currentUserName
-        )
-      )
-      .map((league) => league.id);
+  const { data: myLeaguesData, isLoading: isLoadingMy } = useMyLeagues();
+  const { mutate: quickJoin, isPending: isJoiningQuick } = useQuickJoin();
+  const { mutate: joinLeague, isPending: isJoining } = useJoinLeague();
 
-    setMyLeagueIds(joinedLeagueIds);
-  }, [allLeagues]);
+  const { data: userData } = useMe();
+  const userName = userData?.data?.name || "Member";
+  const defaultTeamName = `${userName}'s Team`;
 
-  React.useEffect(() => {
-    refreshMyLeagues();
-  }, [refreshMyLeagues]);
+  const myLeagueIds = React.useMemo(() => 
+    new Set((myLeaguesData?.data.data || []).map(l => l.id)),
+    [myLeaguesData]
+  );
 
-  React.useEffect(() => {
-    setPage(1);
-  }, [activeView]);
+  const mapLeagueToLobbyEntry = (league: ILeague): LeagueLobbyEntry => {
+    const isMyLeague = myLeagueIds.has(league.id);
+    return {
+      id: league.id,
+      code: league.code,
+      name: league.name,
+      hasPasscode: !league.isSystemGenerated && !!league.code, // Heuristic: system leagues are public
+      draftTime: new Date(league.draftTime).toLocaleString(),
+      members: league.teams?.length || 0,
+      memberLimit: league.memberLimit,
+      actionLabel: isMyLeague ? "View" : "Join",
+      actionStyle: isMyLeague ? "dark" : (league.teams?.length || 0) >= league.memberLimit ? "muted" : "dark",
+      categories: ["LEADERBOARD", "MY TEAM", "FREE AGENTS"],
+    };
+  };
 
   const leaguesToDisplay = React.useMemo<LeagueLobbyEntry[]>(() => {
     if (activeView === "all") {
-      return allLeagues;
+      return (allLeaguesData?.data.data || []).map(l => mapLeagueToLobbyEntry(l));
     }
+    return (myLeaguesData?.data.data || []).map(l => mapLeagueToLobbyEntry(l));
+  }, [activeView, allLeaguesData, myLeaguesData, myLeagueIds]);
 
-    const joinedLeagues = new Set(myLeagueIds);
-    return allLeagues
-      .filter((league) => joinedLeagues.has(league.id))
-      .map(
-        (league) =>
-          ({
-            ...league,
-            actionLabel: "View",
-            actionStyle: "dark",
-            hasPasscode: false,
-            passcode: undefined
-          }) satisfies LeagueLobbyEntry
-      );
-  }, [activeView, allLeagues, myLeagueIds]);
+  const totalCount = activeView === "all" ? (allLeaguesData?.data.meta.total || 0) : leaguesToDisplay.length;
+  const totalPage = activeView === "all" ? (allLeaguesData?.data.meta.totalPage || 1) : 1; // My leagues aren't paginated by API yet
 
-  React.useEffect(() => {
-    const totalPageCount = Math.max(1, Math.ceil(leaguesToDisplay.length / LEAGUES_PER_PAGE));
+  const paginatedLeagues = leaguesToDisplay; // Already paginated by API for "all" view
 
-    if (page > totalPageCount) {
-      setPage(1);
-    }
-  }, [leaguesToDisplay.length, page]);
-
-  const draftingRooms = leaguesToDisplay.length;
-  const fullRooms = leaguesToDisplay.filter(
-    (league) => league.members >= league.memberLimit
+  const draftingRooms = allLeaguesData?.data.meta.total || 0;
+  const fullRooms = (allLeaguesData?.data.data || []).filter(
+    (league) => (league.teams?.length || 0) >= league.memberLimit
   ).length;
-
-  const totalPage = Math.ceil(leaguesToDisplay.length / LEAGUES_PER_PAGE);
-  const startIndex = (page - 1) * LEAGUES_PER_PAGE;
-  const endIndex = startIndex + LEAGUES_PER_PAGE;
-  const paginatedLeagues = leaguesToDisplay.slice(startIndex, endIndex);
 
   const navigateToDraftLobby = (league: LeagueLobbyEntry) => {
     upsertLeagueLobbyMeta({
@@ -112,7 +98,7 @@ export function LeaguesDatabase() {
   };
 
   const handleLeagueAction = (league: LeagueLobbyEntry) => {
-    if (activeView === "my") {
+    if (activeView === "my" || league.actionLabel === "View") {
       router.push(`/leagues-directory/my-team?leagueId=${league.id}`);
       return;
     }
@@ -122,7 +108,17 @@ export function LeaguesDatabase() {
     }
 
     if (!league.hasPasscode) {
-      navigateToDraftLobby(league);
+      joinLeague({
+        code: league.code,
+        teamName: defaultTeamName
+      }, {
+        onSuccess: () => {
+          navigateToDraftLobby(league);
+        },
+        onError: (err: any) => {
+          toast.error(err?.response?.data?.message || "Failed to join league.");
+        }
+      });
       return;
     }
 
@@ -132,31 +128,34 @@ export function LeaguesDatabase() {
   };
 
   const handlePasscodeSubmit = () => {
-    if (!selectedLeague) {
-      return;
-    }
+    if (!selectedLeague) return;
 
-    if (enteredPasscode.trim() !== (selectedLeague.passcode ?? "")) {
-      setPasscodeError("Incorrect passcode. Please try again.");
-      return;
-    }
-
-    navigateToDraftLobby(selectedLeague);
-    setSelectedLeague(null);
-    setEnteredPasscode("");
-    setPasscodeError("");
+    joinLeague({
+      code: selectedLeague.code,
+      passcode: enteredPasscode,
+      teamName: defaultTeamName
+    }, {
+      onSuccess: () => {
+        navigateToDraftLobby(selectedLeague);
+        setSelectedLeague(null);
+      },
+      onError: (err: any) => {
+        setPasscodeError(err?.response?.data?.message || "Failed to join league.");
+      }
+    });
   };
 
   const handleInstantLeagueJoin = () => {
-    upsertLeagueLobbyMeta({
-      id: INSTANT_LEAGUE_ID,
-      name: INSTANT_LEAGUE_NAME,
-      memberLimit: INSTANT_LEAGUE_MEMBER_LIMIT
+    quickJoin({ teamName: defaultTeamName }, {
+      onSuccess: (res) => {
+        const league = res.data;
+        const entry = mapLeagueToLobbyEntry(league);
+        navigateToDraftLobby(entry);
+      },
+      onError: (err: any) => {
+        toast.error(err?.response?.data?.message || "Failed to quick join.");
+      }
     });
-    setLeagueDraftStatus(INSTANT_LEAGUE_ID, "waiting");
-    joinLeagueLobby(INSTANT_LEAGUE_ID);
-    refreshMyLeagues();
-    router.push(`/leagues-directory/draft-lobby?leagueId=${INSTANT_LEAGUE_ID}`);
   };
 
   return (

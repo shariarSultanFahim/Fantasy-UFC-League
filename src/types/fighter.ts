@@ -18,6 +18,7 @@ export interface IFighter {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  divisionRank?: number;
   division?: {
     id: string;
     name: string;

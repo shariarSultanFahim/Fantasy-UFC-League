@@ -7,7 +7,7 @@ import { Card } from "@/components/ui";
 import { Input } from "@/components/ui/input";
 import { DataTablePagination } from "@/components/widgets/DataTablePagination";
 
-import { EVENTS_DATA } from "./events-data";
+import { useEvents } from "@/hooks/use-events";
 import { EventsTable } from "./EventsTable";
 
 const PAGE_SIZE = 5;
@@ -16,36 +16,18 @@ export function EventsDatabase() {
   const [query, setQuery] = React.useState("");
   const [page, setPage] = React.useState(1);
 
-  const filteredEvents = React.useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
+  const { data, isLoading } = useEvents({
+    page,
+    limit: PAGE_SIZE,
+    searchTerm: query.trim() || undefined
+  });
 
-    if (!normalizedQuery) {
-      return EVENTS_DATA;
-    }
-
-    return EVENTS_DATA.filter((event) => {
-      return (
-        event.name.toLowerCase().includes(normalizedQuery) ||
-        event.location.toLowerCase().includes(normalizedQuery) ||
-        event.date.includes(normalizedQuery)
-      );
-    });
-  }, [query]);
-
-  const maxPage = Math.max(1, Math.ceil(filteredEvents.length / PAGE_SIZE));
-  const safePage = Math.min(page, maxPage);
-  const pageStart = (safePage - 1) * PAGE_SIZE;
-  const visibleEvents = filteredEvents.slice(pageStart, pageStart + PAGE_SIZE);
+  const events = (data?.data?.data || []).filter(Boolean);
+  const meta = data?.data?.meta;
 
   React.useEffect(() => {
     setPage(1);
   }, [query]);
-
-  React.useEffect(() => {
-    if (page > maxPage) {
-      setPage(maxPage);
-    }
-  }, [maxPage, page]);
 
   return (
     <section className="space-y-4">
@@ -61,14 +43,25 @@ export function EventsDatabase() {
         </div>
       </Card>
 
-      <EventsTable events={visibleEvents} />
+      {isLoading ? (
+        <Card className="flex h-60 items-center justify-center">
+          <div className="flex flex-col items-center gap-2">
+            <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
+            <p className="text-muted-foreground text-sm">Loading events...</p>
+          </div>
+        </Card>
+      ) : (
+        <>
+          <EventsTable events={events} />
 
-      <DataTablePagination
-        page={safePage}
-        limit={PAGE_SIZE}
-        totalItems={filteredEvents.length}
-        onPageChange={setPage}
-      />
+          <DataTablePagination
+            page={page}
+            limit={PAGE_SIZE}
+            totalItems={meta?.total || 0}
+            onPageChange={setPage}
+          />
+        </>
+      )}
     </section>
   );
 }

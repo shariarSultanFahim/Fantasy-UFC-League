@@ -1,8 +1,19 @@
 import type { ScoringSettings } from "./scoring";
 
-export type EventStatus = "upcoming" | "ongoing" | "completed";
+export type EventStatus = "UPCOMING" | "ONGOING" | "COMPLETED" | "CANCELLED";
 
 export type EventBoutScoringCriteria = Record<keyof ScoringSettings, boolean>;
+
+export interface IBoutOutcome {
+  id: string;
+  winnerId: string;
+  winPoint: boolean;
+  finishBonus: boolean;
+  winningChampionshipBout: boolean;
+  championVsChampionWin: boolean;
+  winningAgainstRankedOpponent: boolean;
+  winningFiveRoundFight: boolean;
+}
 
 export interface EventFighterSnapshot {
   id: string;
@@ -14,6 +25,7 @@ export interface EventFighterSnapshot {
 
 export interface EventBout {
   id: string;
+  eventId: string;
   fighter1: EventFighterSnapshot;
   fighter2: EventFighterSnapshot;
   weightClass: string;
@@ -22,6 +34,7 @@ export interface EventBout {
   isCoMainEvent: boolean;
   winnerId: string | null;
   scoringCriteria?: EventBoutScoringCriteria;
+  outcome?: IBoutOutcome;
 }
 
 export interface Event {
@@ -29,12 +42,47 @@ export interface Event {
   name: string;
   location: string;
   date: string;
-  posterUrl: string;
-  bouts: EventBout[];
+  status: EventStatus;
+  posterUrl: string | null;
   hasResults: boolean;
+  bouts: EventBout[];
+  _count?: { bouts: number };
+}
+
+export interface ICreateEventPayload {
+  name: string;
+  location: string;
+  date: string;
+  bouts: {
+    weightClass: string;
+    rounds: number;
+    isMainEvent?: boolean;
+    isCoMainEvent?: boolean;
+    fighters: { fighterId: string }[];
+  }[];
+}
+
+export interface ICreateBoutPayload {
+  eventId: string;
+  weightClass: string;
+  rounds: number;
+  isMainEvent?: boolean;
+  isCoMainEvent?: boolean;
+  fighters: { fighterId: string }[];
+}
+
+export interface IPostBoutResultPayload {
+  winnerId: string;
+  winPoint: boolean;
+  finishBonus: boolean;
+  winningChampionshipBout: boolean;
+  championVsChampionWin: boolean;
+  winningAgainstRankedOpponent: boolean;
+  winningFiveRoundFight: boolean;
 }
 
 export interface EventBoutFormValue {
+  id?: string;
   fighter1Id: string;
   fighter2Id: string;
   weightClass: string;

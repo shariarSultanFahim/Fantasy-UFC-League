@@ -38,7 +38,7 @@ export function EventCombobox({
   onValueChange
 }: EventComboboxProps) {
   const [open, setOpen] = React.useState(false);
-  const selected = options.find((option) => option.value === value);
+  const selected = options.find((option) => String(option.value) === String(value));
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -71,7 +71,7 @@ export function EventCombobox({
                 >
                   {option.label}
                   <Check
-                    className={cn("ml-auto size-4", option.value === value ? "opacity-100" : "opacity-0")}
+                    className={cn("ml-auto size-4", String(option.value) === String(value) ? "opacity-100" : "opacity-0")}
                   />
                 </CommandItem>
               ))}

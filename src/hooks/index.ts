@@ -5,3 +5,4 @@ export * from "./use-profile";
 export * from "./use-divisions";
 export * from "./use-fighters";
 export * from "./use-debounce";
+export * from "./use-get-img-url";

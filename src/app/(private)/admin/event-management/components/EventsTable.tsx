@@ -51,7 +51,7 @@ export function EventsTable({ events }: EventsTableProps) {
                   </div>
                 </TableCell>
                 <TableCell className="py-4">{event.location}</TableCell>
-                <TableCell className="py-4">{event.bouts.length}</TableCell>
+                <TableCell className="py-4">{event.bouts?.length || 0}</TableCell>
                 <TableCell className="py-4">
                   <EventStatusBadge event={event} />
                 </TableCell>

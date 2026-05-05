@@ -13,6 +13,7 @@ const scoringCriteriaSchema = z.object(
 
 const boutFormSchema = z
   .object({
+    id: z.string().optional(),
     fighter1Id: z.string().trim().min(1, "Select Fighter 1."),
     fighter2Id: z.string().trim().min(1, "Select Fighter 2."),
     weightClass: z.string().trim().min(1, "Select weight class."),
@@ -85,9 +86,10 @@ const baseEventFormSchema = z
     }
   });
 
-export function getEventFormSchema(mode: "create" | "edit") {
+export function getEventFormSchema(mode: "create" | "edit", status?: string) {
   return baseEventFormSchema.superRefine((eventForm, context) => {
-    if (mode === "edit") {
+    // Only require winner and scoring criteria if editing an event that is ONGOING or COMPLETED
+    if (mode === "edit" && status !== "UPCOMING") {
       eventForm.bouts.forEach((bout, index) => {
         if (!bout.winnerId) {
           context.addIssue({

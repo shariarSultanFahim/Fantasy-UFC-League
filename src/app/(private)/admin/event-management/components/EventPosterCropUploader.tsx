@@ -10,6 +10,7 @@ import { Button } from "@/components/ui";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { useGetImgUrl } from "@/hooks/use-get-img-url";
 
 interface EventPosterCropUploaderProps {
   value: string;
@@ -62,6 +63,8 @@ export function EventPosterCropUploader({
   const [crop, setCrop] = React.useState({ x: 0, y: 0 });
   const [zoom, setZoom] = React.useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = React.useState<Area | null>(null);
+
+  const imageUrl = useGetImgUrl(value);
 
   const onCropComplete = React.useCallback((_area: Area, areaPixels: Area) => {
     setCroppedAreaPixels(areaPixels);
@@ -145,12 +148,12 @@ export function EventPosterCropUploader({
         </div>
       ) : null}
 
-      {value ? (
+      {imageUrl ? (
         <div className="space-y-2">
           <Label>Poster Preview</Label>
           <div className="relative aspect-video w-full max-w-2xl overflow-hidden rounded-lg border">
             <NextImage
-              src={value}
+              src={imageUrl}
               alt="Event poster preview"
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1280px) 80vw, 896px"

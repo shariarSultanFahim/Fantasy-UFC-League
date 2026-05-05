@@ -129,7 +129,9 @@ export function SnakeDraftRoomBoard() {
     return teams.find(t => t.ownerId === currentUserId);
   }, [teams, currentUserId]);
 
-  const draftedFighters = myTeam?.fighters || [];
+  const draftedFighters = useMemo(() => {
+    return myTeam?.teamFighters?.map((tf: any) => tf.fighter) || [];
+  }, [myTeam]);
 
   useEffect(() => {
     if (hasShownDraftCompleteModal) {

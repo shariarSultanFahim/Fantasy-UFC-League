@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import type { ILeague, LeagueLobbyEntry, LeagueStatus } from "@/types/league";
-import { useLeagues, useMyLeagues, useQuickJoin, useJoinLeague } from "@/lib/actions/league";
+import { useAvailableLeagues, useMyLeagues, useJoinLeague, useQuickJoin } from "@/lib/actions/league";
 import { useMe } from "@/lib/actions/auth";
 
 import {
@@ -30,60 +30,76 @@ type LeaguesDirectoryView = "all" | "my";
 export function LeaguesDatabase() {
   const router = useRouter();
   const [page, setPage] = React.useState(1);
+  const [searchTerm, setSearchTerm] = React.useState("");
   const [activeView, setActiveView] = React.useState<LeaguesDirectoryView>("all");
   const [selectedLeague, setSelectedLeague] = React.useState<LeagueLobbyEntry | null>(null);
   const [enteredPasscode, setEnteredPasscode] = React.useState("");
   const [passcodeError, setPasscodeError] = React.useState("");
 
-  const { data: allLeaguesData, isLoading: isLoadingAll } = useLeagues({
+  const { data: allLeaguesData, isLoading: isLoadingAll } = useAvailableLeagues({
+    searchTerm,
     page,
     limit: LEAGUES_PER_PAGE,
   });
 
   const { data: myLeaguesData, isLoading: isLoadingMy } = useMyLeagues();
-  const { mutate: quickJoin, isPending: isJoiningQuick } = useQuickJoin();
   const { mutate: joinLeague, isPending: isJoining } = useJoinLeague();
+  const { mutate: quickJoin, isPending: isQuickJoining } = useQuickJoin();
 
   const { data: userData } = useMe();
   const userName = userData?.data?.name || "Member";
   const defaultTeamName = `${userName}'s Team`;
 
   const myLeagueIds = React.useMemo(() => 
-    new Set((myLeaguesData?.data.data || []).map(l => l.id)),
+    new Set((myLeaguesData?.data || []).map(l => l.id)),
     [myLeaguesData]
   );
 
   const mapLeagueToLobbyEntry = (league: ILeague): LeagueLobbyEntry => {
     const isMyLeague = myLeagueIds.has(league.id);
+    const hasPasscode = typeof league.isPrivate === "boolean" ? league.isPrivate : !!league.passcode;
+    
+    // Precise draft start check
+    const draftTimeMs = league.draftTime ? new Date(league.draftTime).getTime() : 0;
+    const isDraftStarted = 
+      league.draftSession?.status === "DRAFTING" || 
+      (draftTimeMs > 0 && draftTimeMs <= Date.now());
+
+    let actionLabel = isMyLeague ? "View" : "Join";
+    if (isMyLeague) {
+      actionLabel = isDraftStarted ? "Enter The Draft" : "View";
+    }
+
     return {
       id: league.id,
       code: league.code,
       name: league.name,
-      hasPasscode: !league.isSystemGenerated && !!league.code, // Heuristic: system leagues are public
+      hasPasscode,
       draftTime: league.draftTime ? new Date(league.draftTime).toLocaleString() : "N/A",
-      members: league.teams?.length || 0,
+      members: league._count?.teams ?? league._count?.members ?? league.teams?.length ?? 0,
       memberLimit: league.memberLimit,
-      actionLabel: isMyLeague ? "View" : "Join",
-      actionStyle: isMyLeague ? "dark" : (league.teams?.length || 0) >= league.memberLimit ? "muted" : "dark",
+      actionLabel,
+      actionStyle: isMyLeague ? "dark" : (league._count?.teams ?? 0) >= league.memberLimit ? "muted" : "dark",
+      isDraftStarted,
       categories: ["LEADERBOARD", "MY TEAM", "FREE AGENTS"],
     };
   };
 
   const leaguesToDisplay = React.useMemo<LeagueLobbyEntry[]>(() => {
     if (activeView === "all") {
-      return (allLeaguesData?.data.data || []).map(l => mapLeagueToLobbyEntry(l));
+      return (allLeaguesData?.data?.data || []).map(l => mapLeagueToLobbyEntry(l));
     }
-    return (myLeaguesData?.data.data || []).map(l => mapLeagueToLobbyEntry(l));
+    return (myLeaguesData?.data || []).map(l => mapLeagueToLobbyEntry(l));
   }, [activeView, allLeaguesData, myLeaguesData, myLeagueIds]);
 
-  const totalCount = activeView === "all" ? (allLeaguesData?.data.meta.total || 0) : leaguesToDisplay.length;
-  const totalPage = activeView === "all" ? (allLeaguesData?.data.meta.totalPage || 1) : 1; // My leagues aren't paginated by API yet
+  const totalCount = activeView === "all" ? (allLeaguesData?.data?.meta.total || 0) : leaguesToDisplay.length;
+  const totalPage = activeView === "all" ? (allLeaguesData?.data?.meta.totalPage || 1) : 1;
 
-  const paginatedLeagues = leaguesToDisplay; // Already paginated by API for "all" view
+  const paginatedLeagues = leaguesToDisplay;
 
-  const draftingRooms = allLeaguesData?.data.meta.total || 0;
-  const fullRooms = (allLeaguesData?.data.data || []).filter(
-    (league) => (league.teams?.length || 0) >= league.memberLimit
+  const draftingRooms = allLeaguesData?.data?.meta.total || 0;
+  const fullRooms = (allLeaguesData?.data?.data || []).filter(
+    (league) => (league._count?.teams || 0) >= league.memberLimit
   ).length;
 
   const navigateToDraftLobby = (league: LeagueLobbyEntry) => {
@@ -98,8 +114,13 @@ export function LeaguesDatabase() {
   };
 
   const handleLeagueAction = (league: LeagueLobbyEntry) => {
-    if (activeView === "my" || league.actionLabel === "View") {
-      router.push(`/leagues-directory/my-team?leagueId=${league.id}`);
+    // If joined, determine if we go to the lobby (countdown) or the active draft
+    if (activeView === "my" || myLeagueIds.has(league.id)) {
+      if (league.isDraftStarted) {
+        router.push(`/leagues-directory/snake-draft?leagueId=${league.id}`);
+      } else {
+        router.push(`/leagues-directory/draft-lobby?leagueId=${league.id}`);
+      }
       return;
     }
 
@@ -210,20 +231,45 @@ export function LeaguesDatabase() {
         </Card>
       </Card>
 
-      <Tabs
-        value={activeView}
-        onValueChange={(value) => setActiveView(value as LeaguesDirectoryView)}
-        className="w-full"
-      >
-        <TabsList className="h-11 rounded-md bg-slate-100 p-1">
-          <TabsTrigger value="all" className="px-5 text-sm font-semibold">
-            Leagues Directory
-          </TabsTrigger>
-          <TabsTrigger value="my" className="px-5 text-sm font-semibold">
-            My Leagues
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <Tabs
+          value={activeView}
+          onValueChange={(value) => {
+            setActiveView(value as LeaguesDirectoryView);
+            setPage(1);
+          }}
+          className="w-full sm:w-auto"
+        >
+          <TabsList className="h-11 rounded-md bg-slate-100 p-1">
+            <TabsTrigger value="all" className="px-5 text-sm font-semibold">
+              Leagues Directory
+            </TabsTrigger>
+            <TabsTrigger value="my" className="px-5 text-sm font-semibold">
+              My Leagues
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+
+        {activeView === "all" && (
+          <div className="relative w-full sm:max-w-xs">
+            <Input
+              type="text"
+              placeholder="Search leagues..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(1);
+              }}
+              className="bg-white pr-10"
+            />
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+              <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+        )}
+      </div>
 
       {activeView === "my" && leaguesToDisplay.length === 0 ? (
         <Card className="border border-dashed border-slate-200 bg-white p-10 text-center">
@@ -240,7 +286,7 @@ export function LeaguesDatabase() {
         <LeaguesPagination
           page={page}
           limit={LEAGUES_PER_PAGE}
-          totalCount={leaguesToDisplay.length}
+          totalCount={totalCount}
           totalPage={totalPage}
           onPageChange={setPage}
         />

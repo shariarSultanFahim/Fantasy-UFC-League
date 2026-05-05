@@ -104,8 +104,8 @@ export function MyLeagueTeamBoard() {
   const [fighterToAdd, setFighterToAdd] = useState<LeagueFighter | null>(null);
 
   const teamRows = useMemo(() => {
-    if (!myTeam?.fighters) return [];
-    return myTeam.fighters.map(mapFighterToTeamRow);
+    if (!myTeam?.teamFighters) return [];
+    return myTeam.teamFighters.map(tf => mapFighterToTeamRow(tf.fighter));
   }, [myTeam]);
 
   const freeAgents = useMemo(() => {

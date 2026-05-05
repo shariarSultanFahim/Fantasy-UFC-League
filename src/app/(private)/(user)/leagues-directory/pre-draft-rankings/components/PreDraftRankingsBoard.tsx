@@ -6,11 +6,11 @@ import { useSearchParams } from "next/navigation";
 
 import { ChevronDown, ChevronUp, Clock3, GripVertical, Plus, Search, X } from "lucide-react";
 
-import type { LeagueFighter } from "@/types/league-simulation";
 
-import { getLeagueQueue, setLeagueQueue } from "@/helpers/league-lobby";
-
-import { LEAGUE_FIGHTERS } from "@/data/league-fighters";
+import { useAvailableFighters } from "@/lib/actions/league";
+import { useDivisions } from "@/hooks/use-divisions";
+import { IFighter } from "@/types/fighter";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { getImageUrl } from "@/lib/utils";
 import { Button, Card, Input } from "@/components/ui";
@@ -42,52 +42,34 @@ export function PreDraftRankingsBoard() {
   const [queueSearch, setQueueSearch] = useState("");
   const [weightClassFilter, setWeightClassFilter] = useState("all");
   const [rankFilter, setRankFilter] = useState("all");
-  const [queue, setQueue] = useState<string[]>(() => {
-    const existingQueue = getLeagueQueue(leagueId);
 
-    if (existingQueue.length) {
-      return existingQueue;
-    }
+  const { data: divisionsData } = useDivisions();
 
-    const fallbackQueue = LEAGUE_FIGHTERS.slice(0, 3).map((fighter) => fighter.id);
-    setLeagueQueue(leagueId, fallbackQueue);
-    return fallbackQueue;
+  const { data: availableFightersData, isLoading: isLoadingAvailable } = useAvailableFighters(leagueId, {
+    searchTerm: nameSearch,
+    divisionId: weightClassFilter === "all" ? undefined : weightClassFilter,
+    limit: 50
   });
 
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      setSecondsLeft((previous) => (previous > 0 ? previous - 1 : 0));
-    }, 1000);
-
-    return () => window.clearInterval(interval);
-  }, []);
-
-  const queueFighterIdSet = useMemo(() => new Set(queue), [queue]);
+  const [queue, setQueue] = useState<string[]>(() => {
+    return getLeagueQueue(leagueId);
+  });
 
   const availableFighters = useMemo(() => {
-    return LEAGUE_FIGHTERS.filter((fighter) => {
-      if (queueFighterIdSet.has(fighter.id)) {
-        return false;
-      }
-
-      const matchesSearch = fighter.name.toLowerCase().includes(nameSearch.toLowerCase());
-      const matchesWeightClass =
-        weightClassFilter === "all" || fighter.weightClass.toLowerCase() === weightClassFilter;
-      const matchesRank =
-        rankFilter === "all" ||
-        (rankFilter === "top-3" && fighter.divisionRank <= 3) ||
-        (rankFilter === "top-5" && fighter.divisionRank <= 5);
-
-      return matchesSearch && matchesWeightClass && matchesRank;
-    });
-  }, [nameSearch, queueFighterIdSet, rankFilter, weightClassFilter]);
+    const allAvailable = availableFightersData?.data?.data || [];
+    return allAvailable.filter((fighter: IFighter) => !queue.includes(fighter.id));
+  }, [availableFightersData, queue]);
 
   const queueFighters = useMemo(() => {
+    const allAvailable = availableFightersData?.data?.data || [];
+    // Note: This only shows fighters that are in the current page of available fighters
+    // In a real app, you'd probably want to fetch the queue details separately
+    // but for now we'll match against what we have or show limited info
     return queue
-      .map((id) => LEAGUE_FIGHTERS.find((fighter) => fighter.id === id))
-      .filter((fighter): fighter is LeagueFighter => Boolean(fighter))
-      .filter((fighter) => fighter.name.toLowerCase().includes(queueSearch.toLowerCase()));
-  }, [queue, queueSearch]);
+      .map((id) => allAvailable.find((f) => f.id === id))
+      .filter((f): f is IFighter => Boolean(f))
+      .filter((f) => f.name.toLowerCase().includes(queueSearch.toLowerCase()));
+  }, [availableFightersData, queue, queueSearch]);
 
   const addToQueue = (fighterId: string) => {
     setQueue((previous) => {
@@ -192,11 +174,9 @@ export function PreDraftRankingsBoard() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Weight Class</SelectItem>
-                  <SelectItem value="featherweight">Featherweight</SelectItem>
-                  <SelectItem value="heavyweight">Heavyweight</SelectItem>
-                  <SelectItem value="bantamweight">Bantamweight</SelectItem>
-                  <SelectItem value="lightweight">Lightweight</SelectItem>
-                  <SelectItem value="flyweight">Flyweight</SelectItem>
+                  {divisionsData?.map((div: any) => (
+                    <SelectItem key={div.id} value={div.id}>{div.name}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 
@@ -222,51 +202,55 @@ export function PreDraftRankingsBoard() {
           </div>
 
           <div className="border-t border-slate-300">
-            {availableFighters.slice(0, 6).map((fighter) => (
-              <div
-                key={fighter.id}
-                className="grid grid-cols-[auto_1fr_auto] items-center gap-4 border-b border-slate-200 bg-[#f3f4f6] px-4 py-3 last:border-b-0 even:bg-[#e5e7eb]"
-              >
-                <span className="inline-flex h-8 min-w-8 items-center justify-center rounded-full bg-slate-300 px-2 text-sm font-semibold text-slate-700">
-                  #{fighter.divisionRank}
-                </span>
-
-                <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
-                  <Image
-                    src={getImageUrl(fighter.avatarUrl)}
-                    alt={fighter.name}
-                    width={42}
-                    height={42}
-                    className="rounded-full object-cover"
-                  />
-                  <div>
-                    <p className="text-lg font-semibold text-slate-900">{fighter.name}</p>
-                    <p className="text-sm text-slate-500">{fighter.weightClass}</p>
-                  </div>
-                  <div className="hidden gap-6 text-sm text-slate-600 md:flex">
-                    <p>
-                      Wins <span className="font-semibold text-slate-800">{fighter.wins}</span>
-                    </p>
-                    <p>
-                      Losses <span className="font-semibold text-slate-800">{fighter.losses}</span>
-                    </p>
-                    <p>
-                      Avg Pts{" "}
-                      <span className="font-semibold text-slate-800">{fighter.avgPoints}</span>
-                    </p>
-                  </div>
-                </div>
-
-                <Button
-                  type="button"
-                  size="icon-sm"
-                  className="bg-[#0E2A57] hover:bg-[#12336b]"
-                  onClick={() => addToQueue(fighter.id)}
+            {isLoadingAvailable ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="px-4 py-3"><Skeleton className="h-16 w-full" /></div>
+              ))
+            ) : availableFighters.length > 0 ? (
+              availableFighters.slice(0, 10).map((fighter) => (
+                <div
+                  key={fighter.id}
+                  className="grid grid-cols-[auto_1fr_auto] items-center gap-4 border-b border-slate-200 bg-[#f3f4f6] px-4 py-3 last:border-b-0 even:bg-[#e5e7eb]"
                 >
-                  <Plus />
-                </Button>
-              </div>
-            ))}
+                  <span className="inline-flex h-8 min-w-8 items-center justify-center rounded-full bg-slate-300 px-2 text-sm font-semibold text-slate-700">
+                    #{fighter.divisionRank}
+                  </span>
+
+                  <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
+                    <Image
+                      src={getImageUrl(fighter.avatarUrl)}
+                      alt={fighter.name}
+                      width={42}
+                      height={42}
+                      className="rounded-full object-cover aspect-square"
+                    />
+                    <div>
+                      <p className="text-lg font-semibold text-slate-900">{fighter.name}</p>
+                      <p className="text-sm text-slate-500">{fighter.division?.name || "MMA"}</p>
+                    </div>
+                    <div className="hidden gap-6 text-sm text-slate-600 md:flex">
+                      <p>
+                        Wins <span className="font-semibold text-slate-800">{fighter.wins}</span>
+                      </p>
+                      <p>
+                        Losses <span className="font-semibold text-slate-800">{fighter.losses}</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <Button
+                    type="button"
+                    size="icon-sm"
+                    className="bg-[#0E2A57] hover:bg-[#12336b]"
+                    onClick={() => addToQueue(fighter.id)}
+                  >
+                    <Plus />
+                  </Button>
+                </div>
+              ))
+            ) : (
+              <div className="p-10 text-center text-slate-400">No fighters available.</div>
+            )}
           </div>
         </Card>
 
@@ -316,11 +300,11 @@ export function PreDraftRankingsBoard() {
                       alt={fighter.name}
                       width={36}
                       height={36}
-                      className="rounded-full object-cover"
+                      className="rounded-full object-cover aspect-square"
                     />
                     <div>
                       <p className="text-base font-semibold text-slate-900">{fighter.name}</p>
-                      <p className="text-xs text-slate-500">{fighter.weightClass}</p>
+                      <p className="text-xs text-slate-500">{fighter.division?.name || "MMA"}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 text-slate-400">

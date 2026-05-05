@@ -1,37 +1,37 @@
-export type LeagueStatus = "DRAFTING" | "ACTIVE" | "COMPLETED" | "ARCHIVED";
-export type LeagueLobbyTab = "MY TEAM" | "FREE AGENTS" | "OPPOSING TEAM" | "LEADERBOARD";
-export type LeagueLobbyActionStyle = "dark" | "muted";
+import { IApiResponse, IPaginatedResponse } from "./auth";
+import { IFighter } from "./fighter";
+
+export type LeagueStatus = 'DRAFTING' | 'ACTIVE' | 'COMPLETED' | 'ARCHIVED';
+export type LeagueType = 'PUBLIC' | 'PRIVATE';
+export type DraftSessionStatus = 'WAITING' | 'DRAFTING' | 'COMPLETED';
+
+export interface IUser {
+  id: string;
+  name: string;
+  email: string;
+  image?: string;
+  avatarUrl?: string;
+}
 
 export interface IScoringSettings {
+  id: string;
+  leagueId: string;
+  systemScoringSettingId: string | null;
   winPoints: number;
   finishBonus: number;
   winningChampionshipBout: number;
   championVsChampionWin: number;
   winningAgainstRankedOpponent: number;
   winningFiveRoundFight: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface ILeague {
-  id: string;
-  name: string;
-  code: string;
-  managerId?: string;
-  managerName: string;
-  managerAvatarUrl?: string;
-  memberCount: number;
-  memberLimit: number;
-  rosterSize?: number;
-  status: LeagueStatus;
-  draftTime?: string;
-  isSystemGenerated?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-  manager?: any; // User details
-  teams?: ITeam[]; // Leaderboard
-  scoringSettings?: IScoringSettings;
+export interface ITeamFighter {
+  teamId: string;
+  fighterId: string;
+  fighter: IFighter;
 }
-
-import { IFighter } from "./fighter";
 
 export interface ITeam {
   id: string;
@@ -39,42 +39,94 @@ export interface ITeam {
   leagueId: string;
   ownerId: string;
   totalPoints: number;
-  rank?: number;
-  iconGlyph?: string;
-  owner?: any; // User details
-  fighters?: IFighter[];
+  rank: number | null;
+  iconGlyph: string | null;
+  owner?: IUser;
+  teamFighters?: ITeamFighter[];
 }
 
-export interface IMeta {
-  page: number;
-  limit: number;
-  total: number;
-  totalPage: number;
+export interface IDraftSession {
+  id: string;
+  leagueId: string;
+  status: DraftSessionStatus;
+  currentRound: number;
+  currentPickIndex: number;
+  secondsPerPick: number;
+  totalRounds: number;
+  version: number;
+  turnStartedAt: string | null;
+  startedAt: string | null;
+  completedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface ILeagueResponse {
-  success: boolean;
-  statusCode: number;
-  message: string;
-  data: ILeague;
+export interface ILeague {
+  id: string;
+  name: string;
+  code: string;               // Unique invite code (e.g., "ABCD-1234")
+  passcode: string | null;     // Optional password for private leagues
+  managerId: string;           // User ID of the league creator
+  memberLimit: number;         // Max teams allowed (default: 8)
+  rosterSize: number;          // Fighters per team (default: 5)
+  status: LeagueStatus;        // Current state of the league
+  draftTime: string | null;    // ISO Date when drafting starts
+  isSystemGenerated: boolean;  // True for official/global leagues
+  deletedAt: string | null;    // Soft delete timestamp
+  createdAt: string;
+  updatedAt: string;
+
+  // Relations
+  manager?: IUser;
+  scoringSettings?: IScoringSettings;
+  draftSession?: IDraftSession;
+  teams?: ITeam[];            // List of teams (for leaderboard)
+  isPrivate?: boolean;        // Optional flag for available leagues
+  _count?: {
+    members: number;
+    teams: number;
+  };
 }
 
-export interface ILeagueListResponse {
+export interface IJoinLeaguePayload {
+  code: string;
+  passcode?: string;
+  teamName: string;
+}
+
+export interface ICreateLeaguePayload {
+  name: string;
+  passcode?: string;
+  memberLimit: number;
+  rosterSize: number;
+  draftTime: string;
+  scoringSettings: {
+    winPoints: number;
+    finishBonus: number;
+    winningChampionshipBout?: number;
+    championVsChampionWin?: number;
+    winningAgainstRankedOpponent?: number;
+    winningFiveRoundFight?: number;
+  };
+}
+
+export type ILeagueResponse = IApiResponse<ILeague>;
+export type ILeagueListResponse = IApiResponse<ILeague[]>;
+export type IAvailableLeagueListResponse = IPaginatedResponse<ILeague>;
+
+export interface IAvailableFightersResponse {
   success: boolean;
   statusCode: number;
   message: string;
   data: {
-    meta: IMeta;
-    data: ILeague[];
+    meta: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPage: number;
+    };
+    data: IFighter[];
   };
-}
-
-export interface IAddFighterPayload {
-  fighterId: string;
-}
-
-export interface IRemoveFighterPayload {
-  fighterId: string;
 }
 
 export interface LeagueLobbyEntry {
@@ -82,11 +134,11 @@ export interface LeagueLobbyEntry {
   code: string;
   name: string;
   hasPasscode: boolean;
-  passcode?: string;
   draftTime: string;
   members: number;
   memberLimit: number;
   actionLabel: string;
-  actionStyle: LeagueLobbyActionStyle;
-  categories: LeagueLobbyTab[];
+  actionStyle: "dark" | "muted";
+  isDraftStarted: boolean;
+  categories: string[];
 }

@@ -20,6 +20,7 @@ interface TradeProposalModalProps {
   yourFighters: TeamStatRow[];
   selectedYourFighter: TeamStatRow | null;
   selectedYourFighterId: string;
+  isPending?: boolean;
   onClose: () => void;
   onSearchChange: (value: string) => void;
   onMessageChange: (value: string) => void;
@@ -35,6 +36,7 @@ export function TradeProposalModal({
   yourFighters,
   selectedYourFighter,
   selectedYourFighterId,
+  isPending,
   onClose,
   onSearchChange,
   onMessageChange,
@@ -61,6 +63,7 @@ export function TradeProposalModal({
                     onChange={(event) => onSearchChange(event.target.value)}
                     placeholder="Search fighter..."
                     className="h-11 bg-white pl-9"
+                    disabled={isPending}
                   />
                 </div>
               </div>
@@ -115,7 +118,11 @@ export function TradeProposalModal({
                     </span>
                   </div>
 
-                  <Select value={selectedYourFighterId} onValueChange={onYourFighterChange}>
+                  <Select 
+                    value={selectedYourFighterId} 
+                    onValueChange={onYourFighterChange}
+                    disabled={isPending}
+                  >
                     <SelectTrigger className="h-11 bg-white text-left">
                       <SelectValue placeholder="Select your fighter" />
                     </SelectTrigger>
@@ -162,6 +169,7 @@ export function TradeProposalModal({
                   onChange={(event) => onMessageChange(event.target.value)}
                   placeholder="Good trade, check stats..."
                   className="min-h-28 bg-white"
+                  disabled={isPending}
                 />
               </div>
 
@@ -172,10 +180,10 @@ export function TradeProposalModal({
                 <Button
                   type="button"
                   className="h-12 bg-[#0E2A57] text-lg hover:bg-[#12336b]"
-                  disabled={!selectedYourFighter}
+                  disabled={!selectedYourFighter || isPending}
                   onClick={onSendTradeOffer}
                 >
-                  Send Trade Offer
+                  {isPending ? "Sending..." : "Send Trade Offer"}
                 </Button>
               </div>
             </div>

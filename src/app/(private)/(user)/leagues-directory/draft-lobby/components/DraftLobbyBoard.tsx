@@ -2,10 +2,20 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useLeague } from "@/lib/actions/league";
+import { useLeague, useLeaveLeague } from "@/lib/actions/league";
 import { useMe } from "@/lib/actions/auth";
+import { toast } from "sonner";
 
-import { Button, Card } from "@/components/ui";
+import {
+  Button,
+  Card,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface TeamRow {
@@ -57,6 +67,10 @@ export function DraftLobbyBoard() {
   const league = leagueData?.data;
   const leagueName = league?.name ?? "MMA League";
   const memberLimit = league?.memberLimit ?? 10;
+  const isManager = league?.managerId === currentUserId;
+
+  const { mutate: leaveLeague, isPending: isLeaving } = useLeaveLeague();
+  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
 
   const [secondsLeft, setSecondsLeft] = useState(0);
 
@@ -80,9 +94,25 @@ export function DraftLobbyBoard() {
     return () => window.clearInterval(interval);
   }, [league?.draftTime]);
 
+  const handleLeaveLeague = () => {
+    if (!leagueId) return;
+
+    leaveLeague(leagueId as string, {
+      onSuccess: (response) => {
+        toast.success(response.message || "Successfully left the league");
+        setIsLeaveModalOpen(false);
+        router.push("/leagues-directory");
+      },
+      onError: (error: any) => {
+        toast.error(error?.message || "Failed to leave the league");
+      },
+    });
+  };
+
   const draftTimeMs = league?.draftTime ? new Date(league.draftTime).getTime() : 0;
   const isDraftRoomOpen =
-    league?.status === "DRAFTING" || (draftTimeMs > 0 && draftTimeMs <= new Date().getTime());
+    league?.draftSession?.status === "DRAFTING" ||
+    (draftTimeMs > 0 && draftTimeMs <= Date.now());
 
   const teamRows = useMemo(() => {
     const joinedTeams = league?.teams || [];
@@ -167,8 +197,8 @@ export function DraftLobbyBoard() {
                 </Button>
                 <button
                   type="button"
-                  className="text-xs text-sky-700 hover:text-sky-800"
-                  onClick={() => router.push("/leagues-directory")}
+                  className="text-xs text-red-600 hover:text-red-700 font-medium"
+                  onClick={() => setIsLeaveModalOpen(true)}
                 >
                   Leave This League
                 </button>
@@ -176,6 +206,41 @@ export function DraftLobbyBoard() {
             </div>
           )}
         </div>
+
+        <Dialog open={isLeaveModalOpen} onOpenChange={setIsLeaveModalOpen}>
+          <DialogContent className="space-y-2">
+            <DialogHeader>
+              <DialogTitle>
+                {isManager ? "Dissolve League?" : "Leave League?"}
+              </DialogTitle>
+              <DialogDescription>
+                {isManager
+                  ? "As the manager, leaving will permanently dissolve this league and delete all teams. This action cannot be undone."
+                  : "Are you sure you want to leave this league? Your team and rankings will be permanently deleted."}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsLeaveModalOpen(false)}
+                disabled={isLeaving}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleLeaveLeague}
+                disabled={isLeaving}
+              >
+                {isLeaving
+                  ? "Leaving..."
+                  : isManager
+                    ? "Dissolve League"
+                    : "Leave League"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <div className="mt-5 overflow-hidden border-2 border-[#1B9AF5] bg-white">
           <table className="w-full border-collapse text-left">

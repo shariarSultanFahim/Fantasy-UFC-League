@@ -46,7 +46,7 @@ export function LeaguesTable({ leagues, onActionClick }: LeaguesTableProps) {
                   {league.name}
                 </TableCell>
                 <TableCell className="py-4 text-sm font-medium text-slate-600">
-                  {league.hasPasscode ? "YES" : "NO"}
+                  {league.hasPasscode ? "Yes" : "No"}
                 </TableCell>
                 <TableCell className="py-4 text-sm text-slate-600">{league.draftTime}</TableCell>
                 <TableCell className="py-4 text-sm text-slate-600">

@@ -1,39 +1,57 @@
 # League Module - Frontend Implementation Plan
  
-This document outlines the API integration for the League module. It covers league creation, joining, management, and the leaderboard.
+This document outlines the API integration for the League module. It covers league creation, joining, management, the leaderboard, and roster adjustments.
  
 ## Base URL
 `/league`
  
+---
+ 
 ## Data Types
  
+### 1. Enums
+- `LeagueStatus`: `'DRAFTING' | 'ACTIVE' | 'COMPLETED' | 'ARCHIVED'`
+- `LeagueType`: `'PUBLIC' | 'PRIVATE'` (Derived from presence of passcode)
+ 
+### 2. Core Interfaces
 ```typescript
-export type LeagueStatus = 'DRAFTING' | 'ACTIVE' | 'COMPLETED' | 'ARCHIVED';
+export interface ILeague {
+  id: string;
+  name: string;
+  code: string;               // Unique invite code (e.g., "ABCD-1234")
+  passcode: string | null;     // Optional password for private leagues
+  managerId: string;           // User ID of the league creator
+  memberLimit: number;         // Max teams allowed (default: 8)
+  rosterSize: number;          // Fighters per team (default: 5)
+  status: LeagueStatus;        // Current state of the league
+  draftTime: string | null;    // ISO Date when drafting starts
+  isSystemGenerated: boolean;  // True for official/global leagues
+  deletedAt: string | null;    // Soft delete timestamp
+  createdAt: string;
+  updatedAt: string;
+ 
+  // Relations
+  manager?: IUser;
+  scoringSettings?: IScoringSettings;
+  teams?: ITeam[];            // List of teams (for leaderboard)
+  _count?: {
+    members: number;
+    teams: number;
+  };
+}
  
 export interface IScoringSettings {
+  id: string;
+  leagueId: string;
+  systemScoringSettingId: string | null;
   winPoints: number;
   finishBonus: number;
   winningChampionshipBout: number;
   championVsChampionWin: number;
   winningAgainstRankedOpponent: number;
   winningFiveRoundFight: number;
-}
- 
-export interface ILeague {
-  id: string;
-  name: string;
-  code: string;
-  managerId: string;
-  memberLimit: number;
-  rosterSize: number;
-  status: LeagueStatus;
-  draftTime: string;
-  isSystemGenerated: boolean;
   createdAt: string;
   updatedAt: string;
-  manager?: any; // User details
-  teams?: ITeam[]; // Leaderboard
-  scoringSettings?: IScoringSettings;
 }
  
 export interface ITeam {
@@ -42,61 +60,69 @@ export interface ITeam {
   leagueId: string;
   ownerId: string;
   totalPoints: number;
-  rank?: number;
-  iconGlyph?: string;
-  owner?: any; // User details
+  rank: number | null;
+  iconGlyph: string | null;
+  owner?: IUser;
+  teamFighters?: ITeamFighter[];
 }
  
-export interface IMeta {
-  page: number;
-  limit: number;
-  total: number;
-  totalPage: number;
-}
- 
-export interface ILeagueResponse {
-  success: boolean;
-  statusCode: number;
-  message: string;
-  data: ILeague;
-}
- 
-export interface ILeagueListResponse {
-  success: boolean;
-  statusCode: number;
-  message: string;
-  data: {
-    meta: IMeta;
-    data: ILeague[];
-  };
-}
-export interface IAddFighterPayload {
-  fighterId: string;
-}
- 
-export interface IRemoveFighterPayload {
-  fighterId: string;
+export interface IUser {
+  id: string;
+  name: string;
+  email: string;
+  image?: string;
 }
 ```
  
+---
  
-## Endpoints
+## Endpoints & Response Examples
  
-### 1. Create League
-Creates a new fantasy league with scoring settings.
- 
-- **URL:** `/league`
-- **Method:** `POST`
-- **Auth Required:** Yes
-- **Request Body:**
+### 1. Get My Leagues
+Fetches leagues where you are either the manager or a participant.
+- **URL:** `/league/my/leagues`
+- **Method:** `GET`
+- **Success Response:**
 ```json
 {
-  "name": "Ultimate Fantasy MMA",
-  "leagueType": "PUBLIC",
-  "memberLimit": 10,
-  "rosterSize": 5,
-  "draftTime": "2024-05-10T18:00:00Z",
-  "secondsPerPick": 60,
+  "success": true,
+  "statusCode": 200,
+  "message": "Leagues retrieved successfully",
+  "data": [
+    {
+      "id": "cmosx9we8000...",
+      "name": "Japan Pro League",
+      "code": "UFC-JAPAN",
+      "passcode": "1234",
+      "status": "DRAFTING",
+      "memberLimit": 8,
+      "rosterSize": 5,
+      "draftTime": "2026-05-09T00:00:00.000Z",
+      "isSystemGenerated": false,
+      "createdAt": "2026-05-06T00:00:00.000Z",
+      "_count": { "teams": 3 }
+    }
+  ]
+}
+```
+ 
+### 2. Get Available Leagues (Search)
+- **URL:** `/league/available`
+- **Method:** `GET`
+- **Query Params:** `searchTerm`, `leagueType`, `page`, `limit`
+- **Note**: Passcode is masked in the response (`isPrivate: true` instead).
+ 
+### 3. Create League
+- **URL:** `/league`
+- **Method:** `POST`
+- **Body:**
+```json
+{
+  "name": "Elite Fighters",
+  "passcode": "optional123",
+  "memberLimit": 12,
+  "rosterSize": 6,
+  "draftTime": "2026-06-01T12:00:00Z",
   "scoringSettings": {
     "winPoints": 10,
     "finishBonus": 5
@@ -104,149 +130,33 @@ Creates a new fantasy league with scoring settings.
 }
 ```
  
-- **Success Response:**
-```json
-{
-  "success": true,
-  "statusCode": 201,
-  "message": "League created successfully",
-  "data": { "id": "...", "name": "...", "code": "ABC123", ... }
-}
-```
+### 4. Get League Details
+- **URL:** `/league/:id`
+- **Method:** `GET`
  
----
- 
-### 2. Join League by Code
-Join an existing league using its unique code.
- 
+### 5. Join League
 - **URL:** `/league/join`
 - **Method:** `POST`
-- **Auth Required:** Yes
-- **Request Body:**
-```json
-{
-  "code": "ABC123",
-  "passcode": "optional_passcode",
-  "teamName": "My Awesome Team"
-}
-```
+- **Body:** `{ "code": "UFC-JAPAN", "passcode": "1234", "teamName": "Tokyo Warriors" }`
  
 ---
  
-### 3. Quick Join
-Join a system-generated league immediately. Creates a new league if no active system leagues have space.
+## Fighter/Roster Management (Post-Draft)
  
-- **URL:** `/league/join-quick`
-- **Method:** `POST`
-- **Auth Required:** Yes
-- **Request Body:**
-```json
-{
-  "teamName": "Fast Team"
-}
-```
- 
----
- 
-### 4. Get My Leagues
-Fetches all leagues the authenticated user is a member of.
- 
-- **URL:** `/league/my/leagues`
-- **Method:** `GET`
-- **Auth Required:** Yes
- 
----
- 
-### 5. Get League Leaderboard
-Fetches detailed information about a league, including the leaderboard (teams sorted by points).
- 
-- **URL:** `/league/:id`
-- **Method:** `GET`
-- **Auth Required:** No
- 
-- **Success Response:**
-```json
-{
-  "success": true,
-  "statusCode": 200,
-  "message": "League retrieved successfully",
-  "data": {
-    "id": "...",
-    "name": "...",
-    "teams": [
-      { "name": "Leader Team", "totalPoints": 150 },
-      { "name": "Challenger Team", "totalPoints": 140 }
-    ]
-  }
-}
-```
- 
----
- 
-### 6. Update League Settings
-Update league name, draft time, or pick duration. Only the league manager can perform this action.
- 
-- **URL:** `/league/:id`
-- **Method:** `PATCH`
-- **Auth Required:** Yes (Manager Only)
-- **Request Body:**
-```json
-{
-  "name": "New Name",
-  "draftTime": "2024-05-15T18:00:00Z",
-  "secondsPerPick": 90
-}
-```
- 
----
- 
-### 7. Delete League
-Soft-deletes the league. Only the manager or an Admin can perform this action.
- 
-- **URL:** `/league/:id`
-- **Method:** `DELETE`
-- **Auth Required:** Yes (Manager or Admin)
- 
----
- 
-### 8. Get Available Fighters in League
-Fetches fighters who are not yet assigned to any team in the specified league.
- 
-- **URL:** `/league/:id/available-fighters`
-- **Method:** `GET`
-- **Auth Required:** Yes
-- **Query Parameters:**
-  - `searchTerm` (string): Search in name/nickname.
-  - `divisionId` (string): Filter by division.
-  - `page`, `limit`, `sortBy`, `sortOrder`.
- 
----
- 
-### 9. Add Fighter to Team
-Adds a new fighter to your team if they are available in the league and your roster is not full.
- 
+### Add Fighter
 - **URL:** `/league/:id/add-fighter`
 - **Method:** `POST`
-- **Auth Required:** Yes (Team Owner Only)
-- **Request Body:**
-```json
-{
-  "fighterId": "available_fighter_id"
-}
-```
+- **Body:** `{ "fighterId": "fighter_uuid" }`
+ 
+### Remove Fighter
+- **URL:** `/league/:id/remove-fighter`
+- **Method:** `POST`
+- **Body:** `{ "fighterId": "fighter_uuid" }`
  
 ---
  
-### 10. Remove Fighter from Team
-Removes a fighter from your team. This allows you to free up a spot to add someone else later.
- 
-- **URL:** `/league/:id/remove-fighter`
-- **Method:** `POST`
-- **Auth Required:** Yes (Team Owner Only)
-- **Request Body:**
-```json
-{
-  "fighterId": "current_fighter_id"
-}
-```
- 
+## Status Workflow
+1.  **DRAFTING**: Default status. Users can join until `memberLimit` is reached or `draftTime` begins.
+2.  **ACTIVE**: Set automatically when the draft completes. Points start accumulating.
+3.  **COMPLETED**: Set after the final event of the season (manual or automated).
+4.  **ARCHIVED**: League is hidden from active lists but kept for history.

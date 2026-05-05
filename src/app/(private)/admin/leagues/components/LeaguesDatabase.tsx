@@ -14,9 +14,10 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { DataTablePagination } from "@/components/widgets/DataTablePagination";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { LeagueStatus } from "@/types";
+import { useAdminLeagues } from "@/lib/actions/league";
 
-import { LEAGUES_DATA } from "./leagues-data";
 import { LeaguesTable } from "./LeaguesTable";
 
 const PAGE_SIZE = 10;
@@ -30,39 +31,37 @@ const FILTER_OPTIONS: Array<{ label: string; value: "all" | LeagueStatus }> = [
 
 export function LeaguesDatabase() {
   const [query, setQuery] = React.useState("");
+  const [debouncedQuery, setDebouncedQuery] = React.useState("");
   const [status, setStatus] = React.useState<"all" | LeagueStatus>("all");
   const [page, setPage] = React.useState(1);
 
-  const filteredLeagues = React.useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
+  React.useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQuery(query);
+      setPage(1);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [query]);
 
-    return LEAGUES_DATA.filter((league) => {
-      const matchedStatus = status === "all" ? true : league.status === status;
-      const matchedQuery =
-        normalizedQuery.length === 0
-          ? true
-          : league.name.toLowerCase().includes(normalizedQuery) ||
-            league.managerName.toLowerCase().includes(normalizedQuery) ||
-            league.id.toLowerCase().includes(normalizedQuery);
+  const { data: response, isLoading } = useAdminLeagues({
+    searchTerm: debouncedQuery,
+    status: status,
+    page: page,
+    limit: PAGE_SIZE,
+  });
 
-      return matchedStatus && matchedQuery;
-    });
-  }, [query, status]);
-
-  const maxPage = Math.max(1, Math.ceil(filteredLeagues.length / PAGE_SIZE));
-  const safePage = Math.min(page, maxPage);
-  const pageStart = (safePage - 1) * PAGE_SIZE;
-  const visibleLeagues = filteredLeagues.slice(pageStart, pageStart + PAGE_SIZE);
+  const leagues = response?.data || [];
+  const totalItems = response?.meta?.total || 0;
+  // If API puts meta at root level due to any structure difference, check:
+  // const totalItems = response?.meta?.total || (response as any)?.data?.meta?.total || 0;
+  // Wait, let's use what auth.ts IPaginatedResponse gives, which is response.data.meta if it's that format
+  // or response.meta if it's the custom structure. I'll check both.
+  const actualTotalItems = response?.meta?.total || response?.data?.meta?.total || 0;
+  const actualLeagues = Array.isArray(response?.data) ? response.data : (response?.data?.data || []);
 
   React.useEffect(() => {
     setPage(1);
-  }, [query, status]);
-
-  React.useEffect(() => {
-    if (page > maxPage) {
-      setPage(maxPage);
-    }
-  }, [maxPage, page]);
+  }, [status]);
 
   return (
     <section className="space-y-4">
@@ -96,14 +95,27 @@ export function LeaguesDatabase() {
         </div>
       </Card>
 
-      <LeaguesTable leagues={visibleLeagues} />
+      <div className="min-h-[400px]">
+        {isLoading ? (
+          <div className="space-y-4">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
+        ) : (
+          <LeaguesTable leagues={actualLeagues} />
+        )}
+      </div>
 
-      <DataTablePagination
-        page={safePage}
-        limit={PAGE_SIZE}
-        totalItems={filteredLeagues.length}
-        onPageChange={setPage}
-      />
+      {!isLoading && actualTotalItems > 0 && (
+        <DataTablePagination
+          page={page}
+          limit={PAGE_SIZE}
+          totalItems={actualTotalItems}
+          onPageChange={setPage}
+        />
+      )}
     </section>
   );
 }

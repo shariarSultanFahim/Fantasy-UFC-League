@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import type { LeagueFighter } from "@/types/league-simulation";
 import type { TeamStatRow } from "@/types/team-details";
 
-import { useLeague } from "@/lib/actions/league";
+import { useLeague, useProposeTrade } from "@/lib/actions/league";
 import { useMe } from "@/lib/actions/auth";
 import { IFighter } from "@/types/fighter";
 
@@ -76,8 +76,8 @@ export function TeamDetailsBoard() {
   }, [league, teamId, teamName]);
 
   const opposingTeamFighters = useMemo(() => {
-    if (!opposingTeam?.fighters) return [];
-    return opposingTeam.fighters.map(mapToTeamRow);
+    if (!opposingTeam?.teamFighters) return [];
+    return opposingTeam.teamFighters.map(tf => mapToTeamRow(tf.fighter));
   }, [opposingTeam]);
 
   const myTeam = useMemo(() => {
@@ -86,8 +86,8 @@ export function TeamDetailsBoard() {
   }, [league, currentUser]);
 
   const yourFighters = useMemo(() => {
-    if (!myTeam?.fighters) return [];
-    return myTeam.fighters.map(mapToTeamRow);
+    if (!myTeam?.teamFighters) return [];
+    return myTeam.teamFighters.map(tf => mapToTeamRow(tf.fighter));
   }, [myTeam]);
 
   const selectedYourFighter = useMemo(() => {
@@ -100,19 +100,25 @@ export function TeamDetailsBoard() {
     );
   }, [opposingTeamFighters, searchFighter]);
 
+  const { mutate: proposeTrade, isPending: isProposing } = useProposeTrade();
+
   const handleSendTradeOffer = () => {
-    if (!targetFighter || !selectedYourFighter) {
+    if (!targetFighter || !selectedYourFighter || !opposingTeam) {
       return;
     }
 
-    // This would typically call a useProposeTrade mutation
-    toast.success("Trade offer sent successfully!", {
-      position: "top-center"
+    proposeTrade({
+      leagueId,
+      targetTeamId: opposingTeam.id,
+      offeredFighterIds: [selectedYourFighter.id],
+      requestedFighterIds: [targetFighter.id]
+    }, {
+      onSuccess: () => {
+        setTargetFighter(null);
+        setSelectedYourFighterId("");
+        setOwnerMessage("");
+      }
     });
-
-    setTargetFighter(null);
-    setSelectedYourFighterId("");
-    setOwnerMessage("");
   };
 
   if (isLoading) {
@@ -184,6 +190,7 @@ export function TeamDetailsBoard() {
         yourFighters={yourFighters}
         selectedYourFighter={selectedYourFighter}
         selectedYourFighterId={selectedYourFighterId}
+        isPending={isProposing}
         onClose={() => setTargetFighter(null)}
         onSearchChange={setSearchFighter}
         onMessageChange={setOwnerMessage}

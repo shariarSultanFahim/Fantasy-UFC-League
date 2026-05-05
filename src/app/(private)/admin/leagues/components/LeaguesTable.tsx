@@ -123,8 +123,12 @@ export function LeaguesTable({ leagues }: LeaguesTableProps) {
               </TableRow>
             ) : null}
             {leagues.map((league) => {
+              const memberCount = league._count?.members || 0;
+              const managerName = league.manager?.name || "Unknown";
+              const managerAvatarUrl = league.manager?.avatarUrl || "";
+
               const membersProgressClass = getMembersProgressClass(
-                league.memberCount,
+                memberCount,
                 league.memberLimit
               );
 
@@ -137,7 +141,9 @@ export function LeaguesTable({ leagues }: LeaguesTableProps) {
                       </div>
                       <div className="space-y-0.5">
                         <p className="font-semibold text-slate-900">{league.name}</p>
-                        <p className="text-xs text-slate-500">ID: #{league.id}</p>
+                        <p className="text-xs text-slate-500">
+                          {league.isPrivate ? "Private" : "Public"} • {league.isSystemGenerated ? "System" : "User"}
+                        </p>
                       </div>
                     </div>
                   </TableCell>
@@ -145,17 +151,17 @@ export function LeaguesTable({ leagues }: LeaguesTableProps) {
                   <TableCell className="py-4">
                     <div className="flex items-center gap-2.5">
                       <Avatar className="size-7">
-                        <AvatarImage src={getImageUrl(league.managerAvatarUrl)} alt={league.managerName} />
-                        <AvatarFallback>{league.managerName.slice(0, 2)}</AvatarFallback>
+                        <AvatarImage src={getImageUrl(managerAvatarUrl)} alt={managerName} />
+                        <AvatarFallback>{managerName.slice(0, 2)}</AvatarFallback>
                       </Avatar>
-                      <span className="font-medium text-slate-700">{league.managerName}</span>
+                      <span className="font-medium text-slate-700">{managerName}</span>
                     </div>
                   </TableCell>
 
                   <TableCell className="py-4">
                     <div className="space-y-1.5">
                       <p className="font-semibold text-slate-900">
-                        {league.memberCount}/{league.memberLimit}
+                        {memberCount}/{league.memberLimit}
                       </p>
                       <div className="h-1.5 w-18.5 rounded-full bg-slate-200">
                         <div
